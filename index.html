@@ -11,15 +11,13 @@
 <style>
 :root {
   --navy:#101d35;
-  --navy2:#172b4d;
+  --navy2:#192e50;
   --cyan:#35d9f5;
   --blue:#2385ff;
-  --bg:#eef3f9;
-  --white:#fff;
-  --text:#18243a;
-  --muted:#8793a6;
+  --bg:#f1f5fa;
+  --text:#19263c;
+  --muted:#8290a5;
   --border:#e4eaf2;
-  --green:#19b982;
   --red:#e55364;
 }
 
@@ -28,8 +26,8 @@
 body {
   margin:0;
   font-family:Arial,"Noto Sans JP",sans-serif;
-  background:var(--bg);
   color:var(--text);
+  background:var(--bg);
 }
 
 button,input,textarea {
@@ -49,7 +47,7 @@ button:disabled {
   display:none !important;
 }
 
-/* ログイン */
+/* ログイン画面 */
 
 .auth-screen {
   min-height:100vh;
@@ -58,15 +56,15 @@ button:disabled {
   justify-content:center;
   padding:20px;
   background:
-    radial-gradient(circle at 20% 20%,#164b72 0,transparent 35%),
+    radial-gradient(circle at 20% 20%,#164b72,transparent 40%),
     linear-gradient(135deg,#0c172b,#172c4b);
 }
 
 .auth-card {
   width:100%;
-  max-width:420px;
+  max-width:430px;
   padding:35px;
-  background:#ffffff;
+  background:white;
   border-radius:22px;
   box-shadow:0 25px 70px #0005;
 }
@@ -96,7 +94,7 @@ button:disabled {
 
 .logo p {
   color:var(--muted);
-  font-size:12px;
+  font-size:11px;
   letter-spacing:2px;
 }
 
@@ -104,7 +102,7 @@ button:disabled {
   display:block;
   font-size:13px;
   font-weight:bold;
-  margin:15px 0 7px;
+  margin:16px 0 7px;
 }
 
 .auth-card input {
@@ -127,19 +125,11 @@ button:disabled {
   color:white;
   font-weight:bold;
   background:linear-gradient(100deg,#1479e9,#19bfdc);
-  margin-top:18px;
-}
-
-.secondary-btn {
-  padding:10px 14px;
-  border:1px solid var(--border);
-  background:white;
-  border-radius:9px;
-  color:var(--text);
+  margin-top:20px;
 }
 
 .auth-switch {
-  margin-top:18px;
+  margin-top:20px;
   text-align:center;
   font-size:13px;
   color:#2586dd;
@@ -148,12 +138,12 @@ button:disabled {
 
 .message {
   font-size:13px;
-  margin-top:12px;
-  line-height:1.6;
+  margin-top:13px;
+  line-height:1.7;
   overflow-wrap:anywhere;
 }
 
-/* アプリ全体 */
+/* アプリ */
 
 .app {
   height:100dvh;
@@ -176,9 +166,6 @@ button:disabled {
 }
 
 .header-brand {
-  display:flex;
-  align-items:center;
-  gap:12px;
   font-size:19px;
   font-weight:bold;
   letter-spacing:1px;
@@ -209,8 +196,6 @@ button:disabled {
   flex:1;
   min-height:0;
 }
-
-/* 左側 */
 
 .sidebar {
   border-right:1px solid var(--border);
@@ -337,8 +322,6 @@ button:disabled {
   text-overflow:ellipsis;
 }
 
-/* 右側トーク */
-
 .chat {
   display:flex;
   flex-direction:column;
@@ -357,7 +340,7 @@ button:disabled {
   padding:25px;
 }
 
-.chat-empty .big-icon {
+.big-icon {
   font-size:60px;
   color:#b6d8e9;
   margin-bottom:15px;
@@ -394,13 +377,6 @@ button:disabled {
   display:flex;
   flex-direction:column;
   gap:13px;
-}
-
-.date-divider {
-  text-align:center;
-  color:var(--muted);
-  font-size:11px;
-  margin:8px 0;
 }
 
 .message-row {
@@ -463,10 +439,6 @@ button:disabled {
   font-size:14px;
 }
 
-.input-area textarea:focus {
-  border-color:var(--cyan);
-}
-
 .send-btn {
   width:48px;
   height:45px;
@@ -477,11 +449,6 @@ button:disabled {
   font-size:20px;
 }
 
-.send-btn:disabled {
-  opacity:.5;
-  cursor:not-allowed;
-}
-
 .status {
   padding:7px 12px;
   font-size:11px;
@@ -490,7 +457,13 @@ button:disabled {
   border-top:1px solid var(--border);
 }
 
-/* スマートフォン */
+.back-btn {
+  display:none;
+  border:0;
+  background:#edf4fa;
+  padding:9px 12px;
+  border-radius:8px;
+}
 
 @media(max-width:700px) {
   .header {
@@ -499,7 +472,7 @@ button:disabled {
   }
 
   .header-brand {
-    font-size:16px;
+    font-size:15px;
   }
 
   .header-user {
@@ -514,11 +487,6 @@ button:disabled {
 
   .main {
     grid-template-columns:1fr;
-    position:relative;
-  }
-
-  .sidebar {
-    border:0;
   }
 
   .chat {
@@ -534,7 +502,7 @@ button:disabled {
   }
 
   .back-btn {
-    display:block !important;
+    display:block;
   }
 
   .messages {
@@ -553,20 +521,10 @@ button:disabled {
     padding:25px;
   }
 }
-
-.back-btn {
-  display:none;
-  border:0;
-  background:#edf4fa;
-  padding:9px 12px;
-  border-radius:8px;
-}
 </style>
 </head>
 
 <body>
-
-<!-- ログイン・登録 -->
 
 <section id="authScreen" class="auth-screen">
   <div class="auth-card">
@@ -586,7 +544,8 @@ button:disabled {
       <input id="loginPassword" type="password"
         placeholder="パスワード" autocomplete="current-password">
 
-      <button class="primary-btn" id="loginButton" type="button">
+      <button class="primary-btn" id="loginButton"
+        type="button" onclick="login()">
         ログイン
       </button>
 
@@ -602,13 +561,14 @@ button:disabled {
 
       <label>メールアドレス</label>
       <input id="signupEmail" type="email"
-        placeholder="メールアドレス" autocomplete="username">
+        placeholder="メールアドレス">
 
       <label>パスワード（6文字以上）</label>
       <input id="signupPassword" type="password"
-        placeholder="パスワード" autocomplete="new-password">
+        placeholder="パスワード">
 
-      <button class="primary-btn" id="signupButton" type="button">
+      <button class="primary-btn" id="signupButton"
+        type="button" onclick="signup()">
         アカウントを作成
       </button>
 
@@ -618,20 +578,13 @@ button:disabled {
     </div>
 
     <div id="authMessage" class="message"></div>
-
   </div>
 </section>
-
-
-<!-- メインアプリ -->
 
 <section id="appScreen" class="app hidden">
 
   <header class="header">
-    <div class="header-brand">
-      ✉ <span>GATE</span> MESSAGE
-    </div>
-
+    <div class="header-brand">✉ <span>GATE</span> MESSAGE</div>
     <div class="header-user">
       <span id="headerName">ユーザー</span>
       <button id="logoutButton" type="button">ログアウト</button>
@@ -641,29 +594,20 @@ button:disabled {
   <main class="main" id="mainLayout">
 
     <aside class="sidebar">
-
       <div class="sidebar-top">
         <div class="sidebar-title">メッセージ</div>
-
-        <input
-          id="userSearch"
-          class="search-box"
-          type="text"
-          placeholder="ユーザー名を検索..."
-          autocomplete="off"
-        >
-
+        <input id="userSearch" class="search-box"
+          type="text" placeholder="ユーザー名を検索...">
         <div id="searchResults" class="search-results"></div>
       </div>
 
       <div class="section-heading">CHATS / トーク一覧</div>
 
       <div id="conversationList" class="conversation-list">
-        <div style="padding:20px;color:#8793a6;font-size:13px">
+        <div style="padding:20px;color:#8793a6">
           トークを読み込み中...
         </div>
       </div>
-
     </aside>
 
     <section class="chat">
@@ -671,35 +615,28 @@ button:disabled {
       <div id="chatEmpty" class="chat-empty">
         <div class="big-icon">✉</div>
         <strong>GATE MESSAGE</strong>
-        <p>左側からユーザーを検索して<br>トークを開始してください。</p>
+        <p>ユーザーを検索して会話を始めてください。</p>
       </div>
 
       <div id="chatContent" class="hidden"
-        style="display:flex;flex-direction:column;flex:1;min-height:0">
+        style="flex:1;min-height:0;flex-direction:column">
 
         <div class="chat-header">
-          <button class="back-btn" id="backButton" type="button">戻る</button>
-
+          <button class="back-btn" id="backButton">戻る</button>
           <div class="avatar" id="chatAvatar">G</div>
-
           <div class="chat-header-info">
             <strong id="chatTitle">トーク</strong>
-            <small id="chatSubtitle">GATE MESSAGE</small>
+            <small>GATE MESSAGE</small>
           </div>
         </div>
 
         <div id="messages" class="messages"></div>
 
         <div class="input-area">
-          <textarea
-            id="messageInput"
+          <textarea id="messageInput"
             placeholder="メッセージを入力..."
-            maxlength="10000"
-            rows="1"
-          ></textarea>
-
-          <button class="send-btn" id="sendButton"
-            type="button" title="送信">➤</button>
+            maxlength="10000" rows="1"></textarea>
+          <button class="send-btn" id="sendButton">➤</button>
         </div>
 
       </div>
@@ -707,18 +644,17 @@ button:disabled {
       <div class="status" id="statusBar">
         GATE MESSAGE / SECURE CHAT
       </div>
-
     </section>
 
   </main>
-
 </section>
 
-
 <script>
-/* =========================================
-   Supabase設定
-========================================= */
+"use strict";
+
+/* ======================================
+   SUPABASE
+====================================== */
 
 const SUPABASE_URL =
   "https://hxrtpftlklgwesvanlpk.supabase.co";
@@ -726,48 +662,50 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ";
 
-let supabase = null;
-
-if (window.supabase?.createClient) {
-  supabase = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-    {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
-    }
-  );
-}
-
-
-/* =========================================
-   状態管理
-========================================= */
+let db = null;
 
 let currentUser = null;
 let currentProfile = null;
 let currentConversation = null;
 let currentConversationName = "";
-let messageSubscription = null;
+
 let conversationsCache = [];
+let messageSubscription = null;
 
 let loginRunning = false;
 let signupRunning = false;
 let appReadyUserId = null;
-let activationPromise = null;
-let signingOut = false;
-
 let searchTimer = null;
+let signingOut = false;
+let initPromise = null;
 
 const $ = id => document.getElementById(id);
 
 
-/* =========================================
-   共通関数
-========================================= */
+/* ======================================
+   初期画面
+====================================== */
+
+function showAuthMessage(message, isError = false) {
+  $("authMessage").textContent = message || "";
+  $("authMessage").style.color =
+    isError ? "#e55364" : "#19a879";
+}
+
+function showLoginScreen(message = "") {
+  $("appScreen").classList.add("hidden");
+  $("authScreen").classList.remove("hidden");
+  showAuthMessage(message);
+}
+
+function showAppScreen() {
+  $("authScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+}
+
+function setStatus(message) {
+  $("statusBar").textContent = message;
+}
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
@@ -779,17 +717,11 @@ function escapeHTML(value) {
   })[c]);
 }
 
-function showAuthMessage(text, error = false) {
-  $("authMessage").textContent = text || "";
-  $("authMessage").style.color =
-    error ? "#e55364" : "#19a879";
+function initial(value) {
+  return (value || "G").trim().charAt(0).toUpperCase();
 }
 
-function setStatus(text) {
-  $("statusBar").textContent = text;
-}
-
-function formatTime(value) {
+function timeText(value) {
   if (!value) return "";
 
   return new Date(value).toLocaleTimeString("ja-JP", {
@@ -798,172 +730,120 @@ function formatTime(value) {
   });
 }
 
-function getInitial(name) {
-  return (name || "G").trim().charAt(0).toUpperCase();
-}
 
-function showLoginScreen(message = "") {
-  $("appScreen").classList.add("hidden");
-  $("authScreen").classList.remove("hidden");
+/* ======================================
+   SUPABASE起動
+====================================== */
 
-  $("loginButton").disabled = false;
-  $("loginButton").textContent = "ログイン";
+function initializeSupabase() {
+  if (!window.supabase ||
+      typeof window.supabase.createClient !== "function") {
+    throw new Error(
+      "Supabaseライブラリを読み込めません。インターネット接続を確認してください。"
+    );
+  }
 
-  showAuthMessage(message);
-}
-
-function showAppScreen() {
-  $("authScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-}
-
-
-/* =========================================
-   Supabase読み込み確認
-========================================= */
-
-if (!supabase) {
-  showAuthMessage(
-    "Supabaseの読み込みに失敗しました。インターネット接続を確認してページを再読み込みしてください。",
-    true
+  db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
   );
 }
 
 
-/* =========================================
-   ログイン・新規登録画面
-========================================= */
-
-$("showSignup").addEventListener("click", () => {
-  $("loginForm").classList.add("hidden");
-  $("signupForm").classList.remove("hidden");
-  showAuthMessage("");
-});
-
-$("showLogin").addEventListener("click", () => {
-  $("signupForm").classList.add("hidden");
-  $("loginForm").classList.remove("hidden");
-  showAuthMessage("");
-});
-
-
-/* =========================================
-   プロフィール管理
-========================================= */
+/* ======================================
+   プロフィール
+====================================== */
 
 async function ensureProfile(user, preferredName = "") {
   if (!user) {
-    throw new Error("ログインユーザーを取得できません");
+    throw new Error("ユーザー情報がありません。");
   }
 
   currentUser = user;
 
-  const { data: profile, error } = await supabase
+  const {data,error} = await db
     .from("profiles")
     .select("id,display_name")
-    .eq("id", user.id)
+    .eq("id",user.id)
     .maybeSingle();
 
   if (error) {
     throw new Error("プロフィール取得エラー: " + error.message);
   }
 
-  if (profile) {
-    currentProfile = profile;
+  if (data) {
+    currentProfile = data;
   } else {
-    const displayName =
+    const name =
       preferredName ||
       user.user_metadata?.display_name ||
       user.user_metadata?.full_name ||
       user.email?.split("@")[0] ||
       "ユーザー";
 
-    const { data: insertedProfile, error: insertError } =
-      await supabase
-        .from("profiles")
-        .upsert({
-          id:user.id,
-          display_name:displayName
-        }, {
-          onConflict:"id"
-        })
-        .select("id,display_name")
-        .single();
+    const {data:created,error:createError} = await db
+      .from("profiles")
+      .upsert({
+        id:user.id,
+        display_name:name
+      },{onConflict:"id"})
+      .select("id,display_name")
+      .single();
 
-    if (insertError) {
-      throw new Error(
-        "プロフィール登録エラー: " + insertError.message
-      );
+    if (createError) {
+      throw new Error("プロフィール登録エラー: " + createError.message);
     }
 
-    currentProfile = insertedProfile;
+    currentProfile = created;
   }
 
   $("headerName").textContent =
-    currentProfile?.display_name || "ユーザー";
+    currentProfile.display_name || "ユーザー";
 }
 
 
-/* =========================================
+/* ======================================
    アプリ起動
-========================================= */
+====================================== */
 
-async function activateSession(user, preferredName = "") {
+async function activateApplication(user, preferredName = "") {
   if (!user) {
-    throw new Error("ログイン情報がありません");
+    throw new Error("ログイン情報が取得できません。");
   }
 
-  // 同じユーザーの初期化を二重に実行しない
   if (appReadyUserId === user.id) {
     showAppScreen();
     return;
   }
 
-  if (activationPromise) {
-    await activationPromise;
+  currentUser = user;
 
-    if (appReadyUserId === user.id) {
-      showAppScreen();
-      return;
-    }
-  }
+  await ensureProfile(user,preferredName);
 
-  activationPromise = (async () => {
-    try {
-      currentUser = user;
+  showAppScreen();
 
-      await ensureProfile(user, preferredName);
+  await loadConversations();
 
-      showAppScreen();
+  appReadyUserId = user.id;
 
-      await loadConversations();
-
-      appReadyUserId = user.id;
-
-      setStatus("GATE MESSAGE / SECURE CHAT");
-
-    } catch (error) {
-      appReadyUserId = null;
-      throw error;
-    } finally {
-      activationPromise = null;
-    }
-  })();
-
-  await activationPromise;
+  setStatus("GATE MESSAGE / SECURE CHAT");
 }
 
 
-/* =========================================
+/* ======================================
    ログイン
-========================================= */
+====================================== */
 
 async function login() {
-  if (!supabase) {
-    showAuthMessage(
-      "Supabaseに接続できません。ページを再読み込みしてください。",
-      true
-    );
+  if (!db) {
+    showAuthMessage("Supabaseが起動していません。ページを再読み込みしてください。",true);
     return;
   }
 
@@ -973,10 +853,7 @@ async function login() {
   const password = $("loginPassword").value;
 
   if (!email || !password) {
-    showAuthMessage(
-      "メールアドレスとパスワードを入力してください。",
-      true
-    );
+    showAuthMessage("メールアドレスとパスワードを入力してください。",true);
     return;
   }
 
@@ -989,31 +866,27 @@ async function login() {
   showAuthMessage("ログインしています...");
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email:email,
-      password:password
+    const {data,error} = await db.auth.signInWithPassword({
+      email,
+      password
     });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    if (!data?.session || !data?.user) {
+    if (!data.user || !data.session) {
       throw new Error("ログインセッションを取得できませんでした。");
     }
 
-    currentUser = data.user;
-
-    await activateSession(data.user);
+    await activateApplication(data.user);
 
     $("loginPassword").value = "";
     showAuthMessage("");
 
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
+    console.error("LOGIN ERROR:",error);
 
     showAuthMessage(
-      "ログインできませんでした: " + error.message,
+      "ログインエラー: " + error.message,
       true
     );
 
@@ -1024,47 +897,27 @@ async function login() {
   }
 }
 
-$("loginButton").addEventListener("click", login);
-
-$("loginPassword").addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    login();
-  }
-});
-
-$("loginEmail").addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    $("loginPassword").focus();
-  }
-});
+window.login = login;
 
 
-/* =========================================
+/* ======================================
    新規登録
-========================================= */
+====================================== */
 
 async function signup() {
-  if (!supabase) {
-    showAuthMessage("Supabaseに接続できません。", true);
-    return;
-  }
-
-  if (signupRunning) return;
+  if (!db || signupRunning) return;
 
   const name = $("signupName").value.trim();
   const email = $("signupEmail").value.trim();
   const password = $("signupPassword").value;
 
   if (!name || !email || !password) {
-    showAuthMessage("すべての項目を入力してください。", true);
+    showAuthMessage("すべての項目を入力してください。",true);
     return;
   }
 
   if (password.length < 6) {
-    showAuthMessage(
-      "パスワードは6文字以上にしてください。",
-      true
-    );
+    showAuthMessage("パスワードは6文字以上にしてください。",true);
     return;
   }
 
@@ -1074,12 +927,10 @@ async function signup() {
   button.disabled = true;
   button.textContent = "登録中...";
 
-  showAuthMessage("アカウントを作成しています...");
-
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email:email,
-      password:password,
+    const {data,error} = await db.auth.signUp({
+      email,
+      password,
       options:{
         data:{
           display_name:name,
@@ -1088,26 +939,20 @@ async function signup() {
       }
     });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     if (data.session && data.user) {
-      await activateSession(data.user, name);
+      await activateApplication(data.user,name);
       showAuthMessage("");
     } else {
       showAuthMessage(
-        "登録を受け付けました。確認メールが届いた場合は、メール認証を完了してからログインしてください。"
+        "登録が完了しました。確認メールが届いた場合は、メール認証後にログインしてください。"
       );
     }
 
   } catch (error) {
-    console.error("SIGNUP ERROR:", error);
-
-    showAuthMessage(
-      "登録に失敗しました: " + error.message,
-      true
-    );
+    console.error("SIGNUP ERROR:",error);
+    showAuthMessage("登録エラー: " + error.message,true);
 
   } finally {
     signupRunning = false;
@@ -1116,21 +961,46 @@ async function signup() {
   }
 }
 
-$("signupButton").addEventListener("click", signup);
+window.signup = signup;
 
 
-/* =========================================
+/* ======================================
+   画面切り替え
+====================================== */
+
+$("showSignup").addEventListener("click",() => {
+  $("loginForm").classList.add("hidden");
+  $("signupForm").classList.remove("hidden");
+  showAuthMessage("");
+});
+
+$("showLogin").addEventListener("click",() => {
+  $("signupForm").classList.add("hidden");
+  $("loginForm").classList.remove("hidden");
+  showAuthMessage("");
+});
+
+$("loginPassword").addEventListener("keydown",event => {
+  if (event.key === "Enter") login();
+});
+
+$("loginEmail").addEventListener("keydown",event => {
+  if (event.key === "Enter") $("loginPassword").focus();
+});
+
+
+/* ======================================
    ユーザー検索
-========================================= */
+====================================== */
 
-$("userSearch").addEventListener("input", () => {
+$("userSearch").addEventListener("input",() => {
   clearTimeout(searchTimer);
 
   const keyword = $("userSearch").value.trim();
 
   searchTimer = setTimeout(() => {
     searchUsers(keyword);
-  }, 350);
+  },350);
 });
 
 async function searchUsers(keyword) {
@@ -1143,161 +1013,121 @@ async function searchUsers(keyword) {
 
   if (!currentUser) return;
 
-  results.innerHTML =
-    '<div style="font-size:12px;color:#8793a6;padding:10px">検索中...</div>';
+  results.textContent = "検索中...";
 
-  const { data, error } = await supabase
+  const {data,error} = await db
     .from("profiles")
     .select("id,display_name")
-    .neq("id", currentUser.id)
-    .ilike("display_name", "%" + keyword + "%")
+    .neq("id",currentUser.id)
+    .ilike("display_name","%" + keyword + "%")
     .order("display_name")
     .limit(20);
 
   if (error) {
-    console.error("USER SEARCH ERROR:", error);
-
-    results.innerHTML =
-      '<div style="font-size:12px;color:#e55364;padding:10px">検索に失敗しました: ' +
-      escapeHTML(error.message) + '</div>';
-
+    results.textContent = "検索エラー: " + error.message;
     return;
   }
 
-  if (!data || data.length === 0) {
-    results.innerHTML =
-      '<div style="font-size:12px;color:#8793a6;padding:10px">ユーザーが見つかりません</div>';
+  if (!data.length) {
+    results.textContent = "ユーザーが見つかりません。";
     return;
   }
 
   results.innerHTML = data.map(user => `
     <div class="user-result"
-      data-user-id="${escapeHTML(user.id)}"
-      data-user-name="${escapeHTML(user.display_name)}">
+      data-id="${escapeHTML(user.id)}"
+      data-name="${escapeHTML(user.display_name)}">
 
-      <div class="avatar">
-        ${escapeHTML(getInitial(user.display_name))}
-      </div>
+      <div class="avatar">${escapeHTML(initial(user.display_name))}</div>
 
       <div class="user-result-info">
         <strong>${escapeHTML(user.display_name)}</strong>
         <small>GATE MESSAGE USER</small>
       </div>
-
-      <span style="color:#168bcb">＋</span>
+      <span>＋</span>
     </div>
   `).join("");
 
   results.querySelectorAll(".user-result").forEach(item => {
-    item.addEventListener("click", () => {
-      startDirectChat(
-        item.dataset.userId,
-        item.dataset.userName
-      );
+    item.addEventListener("click",() => {
+      startDirectChat(item.dataset.id,item.dataset.name);
     });
   });
 }
 
 
-/* =========================================
-   1対1トーク開始
-========================================= */
+/* ======================================
+   1対1トーク
+====================================== */
 
-async function startDirectChat(otherUserId, otherName) {
-  if (!currentUser) return;
-
-  setStatus("トークを準備しています...");
-
+async function startDirectChat(otherId,otherName) {
   try {
-    const { data, error } = await supabase.rpc(
-      "gm_start_direct_chat",
-      {
-        p_other_user_id:otherUserId
-      }
-    );
+    setStatus("トークを準備しています...");
+
+    const {data,error} = await db.rpc("gm_start_direct_chat",{
+      p_other_user_id:otherId
+    });
 
     if (error) throw error;
 
-    if (!data) {
-      throw new Error("トークIDを取得できませんでした。");
-    }
+    if (!data) throw new Error("トークIDを取得できません。");
 
     $("userSearch").value = "";
     $("searchResults").innerHTML = "";
 
     await loadConversations();
-
-    await openConversation(data, otherName);
+    await openConversation(data,otherName);
 
     setStatus("GATE MESSAGE / SECURE CHAT");
 
   } catch (error) {
-    console.error("START CHAT ERROR:", error);
-
-    alert("トークを開始できません: " + error.message);
-
-    setStatus("GATE MESSAGE");
+    console.error(error);
+    alert("トーク開始エラー: " + error.message);
   }
 }
 
 
-/* =========================================
-   トーク一覧取得
-========================================= */
+/* ======================================
+   トーク一覧
+====================================== */
 
 async function loadConversations() {
   if (!currentUser) return;
 
   const list = $("conversationList");
 
-  const { data: memberships, error } = await supabase
+  const {data:memberships,error} = await db
     .from("gm_conversation_members")
     .select("conversation_id")
-    .eq("user_id", currentUser.id);
+    .eq("user_id",currentUser.id);
 
   if (error) {
-    console.error("MEMBERSHIP ERROR:", error);
-
-    list.innerHTML =
-      '<div style="padding:20px;color:#e55364">トーク一覧を取得できません: ' +
-      escapeHTML(error.message) + '</div>';
-
+    list.textContent = "トーク一覧エラー: " + error.message;
     return;
   }
 
-  if (!memberships || memberships.length === 0) {
+  if (!memberships?.length) {
     conversationsCache = [];
-
-    list.innerHTML =
-      '<div style="padding:20px;color:#8793a6;font-size:13px">まだトークはありません。<br>ユーザーを検索して会話を始めましょう。</div>';
-
+    list.textContent = "まだトークはありません。";
     return;
   }
 
   const ids = memberships.map(x => x.conversation_id);
 
-  const { data: conversations, error:conversationError } =
-    await supabase
-      .from("gm_conversations")
-      .select("id,conversation_type,title,created_at")
-      .in("id", ids)
-      .order("created_at", {ascending:false});
+  const {data:conversations,error:conversationError} = await db
+    .from("gm_conversations")
+    .select("id,conversation_type,title,created_at")
+    .in("id",ids)
+    .order("created_at",{ascending:false});
 
-  if (conversationError) {
-    console.error("CONVERSATION ERROR:", conversationError);
-    return;
-  }
+  if (conversationError) throw conversationError;
 
-  const { data: members, error:memberError } =
-    await supabase
-      .from("gm_conversation_members")
-      .select("conversation_id,user_id")
-      .in("conversation_id", ids);
+  const {data:members,error:memberError} = await db
+    .from("gm_conversation_members")
+    .select("conversation_id,user_id")
+    .in("conversation_id",ids);
 
-  if (memberError) {
-    console.error("MEMBER ERROR:", memberError);
-    return;
-  }
+  if (memberError) throw memberError;
 
   const otherIds = [...new Set(
     (members || [])
@@ -1308,54 +1138,44 @@ async function loadConversations() {
   let profiles = [];
 
   if (otherIds.length) {
-    const { data, error:profileError } = await supabase
+    const {data,error:profileError} = await db
       .from("profiles")
       .select("id,display_name")
-      .in("id", otherIds);
+      .in("id",otherIds);
 
-    if (profileError) {
-      console.error("PROFILE ERROR:", profileError);
-    }
+    if (profileError) throw profileError;
 
     profiles = data || [];
   }
 
-  const { data: latestMessages, error:latestError } =
-    await supabase
-      .from("gm_messages")
-      .select("conversation_id,content,created_at")
-      .in("conversation_id", ids)
-      .order("created_at", {ascending:false})
-      .limit(200);
+  const {data:latestMessages,error:messageError} = await db
+    .from("gm_messages")
+    .select("conversation_id,content,created_at")
+    .in("conversation_id",ids)
+    .order("created_at",{ascending:false})
+    .limit(200);
 
-  if (latestError) {
-    console.error("LATEST MESSAGE ERROR:", latestError);
-  }
+  if (messageError) throw messageError;
 
-  conversationsCache = (conversations || []).map(conversation => {
-    const conversationMembers = (members || []).filter(
-      m => m.conversation_id === conversation.id
+  conversationsCache = (conversations || []).map(c => {
+    const other = (members || []).find(
+      m => m.conversation_id === c.id &&
+      m.user_id !== currentUser.id
     );
 
-    const otherMember = conversationMembers.find(
-      m => m.user_id !== currentUser.id
-    );
+    const profile = profiles.find(p => p.id === other?.user_id);
 
-    const otherProfile = profiles.find(
-      p => p.id === otherMember?.user_id
-    );
-
-    const lastMessage = (latestMessages || []).find(
-      m => m.conversation_id === conversation.id
+    const latest = (latestMessages || []).find(
+      m => m.conversation_id === c.id
     );
 
     return {
-      ...conversation,
-      name:conversation.conversation_type === "group"
-        ? conversation.title || "グループ"
-        : otherProfile?.display_name || "ユーザー",
-      lastMessage:lastMessage?.content || "メッセージはありません",
-      lastTime:lastMessage?.created_at || conversation.created_at
+      ...c,
+      name:c.conversation_type === "group"
+        ? c.title || "グループ"
+        : profile?.display_name || "ユーザー",
+      lastMessage:latest?.content || "メッセージはありません",
+      lastTime:latest?.created_at || c.created_at
     };
   });
 
@@ -1363,148 +1183,123 @@ async function loadConversations() {
 }
 
 
-/* =========================================
-   トーク一覧表示
-========================================= */
+/* ======================================
+   トーク一覧描画
+====================================== */
 
 function renderConversationList() {
   const list = $("conversationList");
 
   if (!conversationsCache.length) {
-    list.innerHTML =
-      '<div style="padding:20px;color:#8793a6;font-size:13px">トークはありません</div>';
+    list.textContent = "トークはありません。";
     return;
   }
 
   list.innerHTML = conversationsCache.map(c => `
-    <div class="conversation-item
-      ${currentConversation === c.id ? "active" : ""}"
+    <div class="conversation-item ${currentConversation === c.id ? "active" : ""}"
       data-id="${escapeHTML(c.id)}"
       data-name="${escapeHTML(c.name)}">
 
-      <div class="avatar">
-        ${escapeHTML(getInitial(c.name))}
-      </div>
+      <div class="avatar">${escapeHTML(initial(c.name))}</div>
 
       <div class="conversation-info">
         <strong>${escapeHTML(c.name)}</strong>
         <small>${escapeHTML(c.lastMessage)}</small>
       </div>
 
-      <small style="color:#9ba7b6;font-size:10px">
-        ${escapeHTML(formatTime(c.lastTime))}
-      </small>
-
+      <small>${escapeHTML(timeText(c.lastTime))}</small>
     </div>
   `).join("");
 
   list.querySelectorAll(".conversation-item").forEach(item => {
-    item.addEventListener("click", () => {
-      openConversation(item.dataset.id, item.dataset.name);
+    item.addEventListener("click",() => {
+      openConversation(item.dataset.id,item.dataset.name);
     });
   });
 }
 
 
-/* =========================================
-   トーク画面を開く
-========================================= */
+/* ======================================
+   トーク画面
+====================================== */
 
-async function openConversation(conversationId, name) {
-  currentConversation = conversationId;
+async function openConversation(id,name) {
+  currentConversation = id;
   currentConversationName = name;
 
   $("chatEmpty").classList.add("hidden");
   $("chatContent").classList.remove("hidden");
+  $("chatContent").style.display = "flex";
 
   $("chatTitle").textContent = name;
-  $("chatAvatar").textContent = getInitial(name);
-  $("chatSubtitle").textContent = "GATE MESSAGE";
+  $("chatAvatar").textContent = initial(name);
 
   $("mainLayout").classList.add("chat-open");
 
   renderConversationList();
 
   await loadMessages();
-
-  subscribeMessages(conversationId);
+  subscribeMessages(id);
 }
 
 
-/* =========================================
+/* ======================================
    メッセージ取得
-========================================= */
+====================================== */
 
 async function loadMessages() {
-  if (!currentConversation || !currentUser) return;
+  if (!currentConversation) return;
 
-  const conversationId = currentConversation;
+  const id = currentConversation;
   const box = $("messages");
 
-  box.innerHTML =
-    '<div style="color:#8793a6;text-align:center">読み込み中...</div>';
-
-  const { data, error } = await supabase
+  const {data,error} = await db
     .from("gm_messages")
     .select("id,conversation_id,sender_id,content,created_at")
-    .eq("conversation_id", conversationId)
-    .order("created_at", {ascending:true})
+    .eq("conversation_id",id)
+    .order("created_at",{ascending:true})
     .limit(500);
 
   if (error) {
-    console.error("LOAD MESSAGES ERROR:", error);
-
-    box.innerHTML =
-      '<div style="color:#e55364;text-align:center">メッセージの取得に失敗しました: ' +
-      escapeHTML(error.message) + '</div>';
-
+    box.textContent = "メッセージ取得エラー: " + error.message;
     return;
   }
 
-  // 読み込み中に別トークへ移動した場合は表示しない
-  if (currentConversation !== conversationId) return;
+  if (currentConversation !== id) return;
 
   renderMessages(data || []);
 }
 
 
-/* =========================================
-   メッセージ表示
-========================================= */
+/* ======================================
+   メッセージ描画
+====================================== */
 
 function renderMessages(messages) {
   const box = $("messages");
 
   if (!messages.length) {
     box.innerHTML =
-      '<div style="color:#8793a6;text-align:center;margin:auto;font-size:13px">会話を始めましょう！</div>';
+      '<div style="margin:auto;color:#8793a6">会話を始めましょう！</div>';
     return;
   }
 
-  box.innerHTML = messages.map(message => {
-    const mine = message.sender_id === currentUser.id;
-
-    const sender = mine
-      ? currentProfile?.display_name || "自分"
-      : currentConversationName;
+  box.innerHTML = messages.map(m => {
+    const mine = m.sender_id === currentUser.id;
 
     return `
       <div class="message-row ${mine ? "mine" : ""}">
-
         ${mine ? "" : `
           <div class="message-sender">
-            ${escapeHTML(sender)}
+            ${escapeHTML(currentConversationName)}
           </div>
         `}
 
-        <div class="bubble">
-          ${escapeHTML(message.content)}
-        </div>
+        <div class="bubble">${escapeHTML(m.content)}</div>
 
         <div class="message-time">
-          ${escapeHTML(formatTime(message.created_at))}
+          ${escapeHTML(timeText(m.created_at))}
         </div>
-
       </div>
     `;
   }).join("");
@@ -1513,9 +1308,9 @@ function renderMessages(messages) {
 }
 
 
-/* =========================================
+/* ======================================
    メッセージ送信
-========================================= */
+====================================== */
 
 async function sendMessage() {
   if (!currentUser || !currentConversation) return;
@@ -1526,47 +1321,40 @@ async function sendMessage() {
 
   if (!content) return;
 
-  if (content.length > 10000) {
-    alert("メッセージは10000文字以内にしてください。");
-    return;
-  }
-
-  const conversationId = currentConversation;
+  const id = currentConversation;
 
   button.disabled = true;
 
   try {
-    const { error } = await supabase
+    const {error} = await db
       .from("gm_messages")
       .insert({
-        conversation_id:conversationId,
+        conversation_id:id,
         sender_id:currentUser.id,
-        content:content
+        content
       });
 
     if (error) throw error;
 
     input.value = "";
 
-    if (currentConversation === conversationId) {
+    if (currentConversation === id) {
       await loadMessages();
     }
 
     await loadConversations();
 
   } catch (error) {
-    console.error("SEND MESSAGE ERROR:", error);
-    alert("送信に失敗しました: " + error.message);
-
+    alert("送信エラー: " + error.message);
   } finally {
     button.disabled = false;
     input.focus();
   }
 }
 
-$("sendButton").addEventListener("click", sendMessage);
+$("sendButton").addEventListener("click",sendMessage);
 
-$("messageInput").addEventListener("keydown", event => {
+$("messageInput").addEventListener("keydown",event => {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
     sendMessage();
@@ -1574,57 +1362,49 @@ $("messageInput").addEventListener("keydown", event => {
 });
 
 
-/* =========================================
-   リアルタイム受信
-========================================= */
+/* ======================================
+   リアルタイム
+====================================== */
 
 function unsubscribeMessages() {
-  if (messageSubscription && supabase) {
-    supabase.removeChannel(messageSubscription);
+  if (messageSubscription && db) {
+    db.removeChannel(messageSubscription);
   }
 
   messageSubscription = null;
 }
 
-function subscribeMessages(conversationId) {
+function subscribeMessages(id) {
   unsubscribeMessages();
 
-  messageSubscription = supabase
-    .channel("gm-chat-" + conversationId)
+  messageSubscription = db
+    .channel("gm-chat-" + id)
     .on(
       "postgres_changes",
       {
         event:"INSERT",
         schema:"public",
         table:"gm_messages",
-        filter:"conversation_id=eq." + conversationId
+        filter:"conversation_id=eq." + id
       },
       async payload => {
-        if (currentConversation !== conversationId) return;
+        if (currentConversation !== id) return;
 
-        if (payload.new?.sender_id === currentUser?.id) return;
+        if (payload.new.sender_id === currentUser.id) return;
 
         await loadMessages();
         await loadConversations();
       }
     )
-    .subscribe(status => {
-      if (status === "CHANNEL_ERROR") {
-        console.error("Realtime channel error:", conversationId);
-
-        setStatus(
-          "リアルタイム接続に問題があります。再読み込みしてください。"
-        );
-      }
-    });
+    .subscribe();
 }
 
 
-/* =========================================
+/* ======================================
    戻る
-========================================= */
+====================================== */
 
-$("backButton").addEventListener("click", () => {
+$("backButton").addEventListener("click",() => {
   $("mainLayout").classList.remove("chat-open");
 
   unsubscribeMessages();
@@ -1633,24 +1413,26 @@ $("backButton").addEventListener("click", () => {
   currentConversationName = "";
 
   $("chatContent").classList.add("hidden");
+  $("chatContent").style.display = "none";
+
   $("chatEmpty").classList.remove("hidden");
 
   renderConversationList();
 });
 
 
-/* =========================================
+/* ======================================
    ログアウト
-========================================= */
+====================================== */
 
-$("logoutButton").addEventListener("click", async () => {
+$("logoutButton").addEventListener("click",async () => {
   if (!confirm("ログアウトしますか？")) return;
 
   signingOut = true;
   unsubscribeMessages();
 
   try {
-    const { error } = await supabase.auth.signOut();
+    const {error} = await db.auth.signOut();
 
     if (error) throw error;
 
@@ -1661,95 +1443,1657 @@ $("logoutButton").addEventListener("click", async () => {
     appReadyUserId = null;
     conversationsCache = [];
 
-    $("conversationList").innerHTML = "";
-    $("messages").innerHTML = "";
-    $("userSearch").value = "";
-    $("searchResults").innerHTML = "";
-
     showLoginScreen("ログアウトしました。");
 
   } catch (error) {
-    console.error("LOGOUT ERROR:", error);
-
-    alert("ログアウトに失敗しました: " + error.message);
-
+    alert("ログアウトエラー: " + error.message);
   } finally {
     signingOut = false;
   }
 });
 
 
-/* =========================================
-   認証状態の監視
-========================================= */
+/* ======================================
+   認証状態監視
+====================================== */
 
-if (supabase) {
-  supabase.auth.onAuthStateChange((event, session) => {
+async function initializePage() {
+  try {
+    initializeSupabase();
 
-    // Supabaseの認証コールバック内でDB処理を直接実行しない
-    setTimeout(async () => {
-      if (session?.user) {
-        if (appReadyUserId !== session.user.id) {
-          try {
-            await activateSession(session.user);
-          } catch (error) {
-            console.error(
-              "AUTH STATE INITIALIZATION ERROR:",
-              error
-            );
+    const {data,error} = await db.auth.getSession();
 
-            showLoginScreen(
-              "ログイン後の初期化に失敗しました: " + error.message
-            );
-          }
-        }
-      } else if (!signingOut) {
-        currentUser = null;
-        currentProfile = null;
-        currentConversation = null;
-        currentConversationName = "";
-        appReadyUserId = null;
+    if (error) throw error;
 
-        unsubscribeMessages();
-
-        showLoginScreen("");
-      }
-    }, 0);
-  });
-
-
-  /* =======================================
-     ページ読み込み時のログイン状態確認
-  ======================================= */
-
-  (async function initializePage() {
-    try {
-      const { data, error } = await supabase.auth.getSession();
-
-      if (error) throw error;
-
-      if (data?.session?.user) {
-        await activateSession(data.session.user);
-      } else {
-        showLoginScreen("");
-      }
-
-    } catch (error) {
-      console.error("INITIAL SESSION ERROR:", error);
-
-      showLoginScreen(
-        "ログイン状態を確認できませんでした: " + error.message
-      );
+    if (data.session?.user) {
+      await activateApplication(data.session.user);
+    } else {
+      showLoginScreen("");
     }
-  })();
 
-} else {
-  showAuthMessage(
-    "Supabaseの読み込みに失敗しました。インターネット接続を確認してページを再読み込みしてください。",
-    true
+    db.auth.onAuthStateChange((event,session) => {
+      if (event === "INITIAL_SESSION") return;
+
+      setTimeout(async () => {
+        if (session?.user) {
+          if (appReadyUserId !== session.user.id) {
+            try {
+              await activateApplication(session.user);
+            } catch (error) {
+              console.error(error);
+              showLoginScreen(
+                "初期化エラー: " + error.message
+              );
+            }
+          }
+        } else if (!signingOut) {
+          currentUser = null;
+          currentProfile = null;
+          currentConversation = null;
+          currentConversationName = "";
+          appReadyUserId = null;
+
+          unsubscribeMessages();
+
+          showLoginScreen("");
+        }
+      },0);
+    });
+
+  } catch (error) {
+    console.error("INITIALIZATION ERROR:",error);
+
+    showLoginScreen(
+      "起動エラー: " + error.message
+    );
+  }
+}
+
+
+/* ======================================
+   エラー表示
+====================================== */
+
+window.addEventListener("error",event => {
+  console.error("JAVASCRIPT ERROR:",event.error || event.message);
+
+  if (!$("appScreen").classList.contains("hidden")) {
+    setStatus("JavaScriptエラーが発生しました。");
+  } else {
+    showAuthMessage(
+      "ページの処理でエラーが発生しました: " + event.message,
+      true
+    );
+  }
+});
+
+window.addEventListener("unhandledrejection",event => {
+  console.error("PROMISE ERROR:",event.reason);
+
+  const message = event.reason?.message || String(event.reason);
+
+  if ($("authScreen") && !$("authScreen").classList.contains("hidden")) {
+    showAuthMessage("処理エラー: " + message,true);
+  }
+});
+
+
+/* ======================================
+   起動
+====================================== */
+
+initializePage();
+
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101d35">
+<title>GATE MESSAGE | GATE SQUARE</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --navy:#101d35;
+  --navy2:#192e50;
+  --cyan:#35d9f5;
+  --blue:#2385ff;
+  --bg:#f1f5fa;
+  --text:#19263c;
+  --muted:#8290a5;
+  --border:#e4eaf2;
+  --red:#e55364;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family:Arial,"Noto Sans JP",sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+
+button,input,textarea {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.hidden {
+  display:none !important;
+}
+
+/* ログイン画面 */
+
+.auth-screen {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at 20% 20%,#164b72,transparent 40%),
+    linear-gradient(135deg,#0c172b,#172c4b);
+}
+
+.auth-card {
+  width:100%;
+  max-width:430px;
+  padding:35px;
+  background:white;
+  border-radius:22px;
+  box-shadow:0 25px 70px #0005;
+}
+
+.logo {
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.logo-icon {
+  width:65px;
+  height:65px;
+  margin:auto;
+  display:grid;
+  place-items:center;
+  background:var(--navy);
+  color:var(--cyan);
+  border-radius:20px;
+  font-size:30px;
+}
+
+.logo h1 {
+  margin:14px 0 5px;
+  letter-spacing:2px;
+  font-size:25px;
+}
+
+.logo p {
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:2px;
+}
+
+.auth-card label {
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin:16px 0 7px;
+}
+
+.auth-card input {
+  width:100%;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  outline:none;
+}
+
+.auth-card input:focus {
+  border-color:var(--cyan);
+}
+
+.primary-btn {
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+  color:white;
+  font-weight:bold;
+  background:linear-gradient(100deg,#1479e9,#19bfdc);
+  margin-top:20px;
+}
+
+.auth-switch {
+  margin-top:20px;
+  text-align:center;
+  font-size:13px;
+  color:#2586dd;
+  cursor:pointer;
+}
+
+.message {
+  font-size:13px;
+  margin-top:13px;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+
+/* アプリ */
+
+.app {
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  max-width:1500px;
+  margin:auto;
+  background:white;
+}
+
+.header {
+  min-height:65px;
+  background:var(--navy);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  border-bottom:2px solid var(--cyan);
+}
+
+.header-brand {
+  font-size:19px;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+.header-brand span {
+  color:var(--cyan);
+}
+
+.header-user {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+}
+
+.header-user button {
+  border:1px solid #ffffff55;
+  background:transparent;
+  color:white;
+  padding:8px 12px;
+  border-radius:8px;
+}
+
+.main {
+  display:grid;
+  grid-template-columns:340px 1fr;
+  flex:1;
+  min-height:0;
+}
+
+.sidebar {
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.sidebar-top {
+  padding:20px;
+  border-bottom:1px solid var(--border);
+}
+
+.sidebar-title {
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.search-box {
+  width:100%;
+  border:1px solid var(--border);
+  background:#f5f8fc;
+  padding:12px;
+  border-radius:10px;
+  outline:none;
+}
+
+.search-results {
+  margin-top:10px;
+  max-height:180px;
+  overflow:auto;
+}
+
+.user-result {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.user-result:hover {
+  background:#eef7fc;
+}
+
+.avatar {
+  width:42px;
+  height:42px;
+  flex-shrink:0;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:white;
+  font-weight:bold;
+  background:linear-gradient(135deg,#176fbd,#31c8df);
+}
+
+.user-result-info {
+  min-width:0;
+  flex:1;
+}
+
+.user-result-info strong {
+  display:block;
+  font-size:14px;
+}
+
+.user-result-info small {
+  color:var(--muted);
+  font-size:11px;
+}
+
+.section-heading {
+  padding:17px 20px 8px;
+  font-size:12px;
+  font-weight:bold;
+  color:var(--muted);
+  letter-spacing:1px;
+}
+
+.conversation-list {
+  overflow:auto;
+  flex:1;
+}
+
+.conversation-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 18px;
+  cursor:pointer;
+  border-bottom:1px solid #f0f3f7;
+}
+
+.conversation-item:hover {
+  background:#f4f8fc;
+}
+
+.conversation-item.active {
+  background:#eaf7fc;
+  border-left:4px solid var(--cyan);
+  padding-left:14px;
+}
+
+.conversation-info {
+  flex:1;
+  min-width:0;
+}
+
+.conversation-info strong {
+  display:block;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.conversation-info small {
+  color:var(--muted);
+  font-size:12px;
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.chat {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+}
+
+.chat-empty {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  color:var(--muted);
+  text-align:center;
+  padding:25px;
+}
+
+.big-icon {
+  font-size:60px;
+  color:#b6d8e9;
+  margin-bottom:15px;
+}
+
+.chat-header {
+  padding:16px 22px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border-bottom:1px solid var(--border);
+  min-height:75px;
+}
+
+.chat-header-info {
+  flex:1;
+}
+
+.chat-header-info strong {
+  display:block;
+  font-size:16px;
+}
+
+.chat-header-info small {
+  color:var(--muted);
+  font-size:12px;
+}
+
+.messages {
+  flex:1;
+  overflow-y:auto;
+  padding:24px;
+  background:#f7f9fc;
+  display:flex;
+  flex-direction:column;
+  gap:13px;
+}
+
+.message-row {
+  display:flex;
+  flex-direction:column;
+  max-width:75%;
+  align-self:flex-start;
+}
+
+.message-row.mine {
+  align-self:flex-end;
+  align-items:flex-end;
+}
+
+.message-sender {
+  font-size:11px;
+  color:var(--muted);
+  margin:0 5px 5px;
+}
+
+.bubble {
+  padding:12px 15px;
+  border-radius:16px;
+  background:white;
+  box-shadow:0 2px 7px #10243b0c;
+  font-size:14px;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+}
+
+.mine .bubble {
+  background:#d9f7ff;
+  border-bottom-right-radius:4px;
+}
+
+.message-time {
+  color:#a1aabb;
+  font-size:10px;
+  margin:4px 5px 0;
+}
+
+.input-area {
+  padding:15px 20px;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+}
+
+.input-area textarea {
+  flex:1;
+  min-height:45px;
+  max-height:120px;
+  resize:none;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  outline:none;
+  font-size:14px;
+}
+
+.send-btn {
+  width:48px;
+  height:45px;
+  border:0;
+  border-radius:12px;
+  color:white;
+  background:linear-gradient(135deg,#1684eb,#20c6df);
+  font-size:20px;
+}
+
+.status {
+  padding:7px 12px;
+  font-size:11px;
+  color:var(--muted);
+  background:#f7f9fc;
+  border-top:1px solid var(--border);
+}
+
+.back-btn {
+  display:none;
+  border:0;
+  background:#edf4fa;
+  padding:9px 12px;
+  border-radius:8px;
+}
+
+@media(max-width:700px) {
+  .header {
+    padding:0 12px;
+    min-height:58px;
+  }
+
+  .header-brand {
+    font-size:15px;
+  }
+
+  .header-user {
+    gap:6px;
+    font-size:11px;
+  }
+
+  .header-user button {
+    padding:7px;
+    font-size:11px;
+  }
+
+  .main {
+    grid-template-columns:1fr;
+  }
+
+  .chat {
+    display:none;
+  }
+
+  .main.chat-open .sidebar {
+    display:none;
+  }
+
+  .main.chat-open .chat {
+    display:flex;
+  }
+
+  .back-btn {
+    display:block;
+  }
+
+  .messages {
+    padding:16px 12px;
+  }
+
+  .message-row {
+    max-width:85%;
+  }
+
+  .input-area {
+    padding:10px;
+  }
+
+  .auth-card {
+    padding:25px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<section id="authScreen" class="auth-screen">
+  <div class="auth-card">
+
+    <div class="logo">
+      <div class="logo-icon">✉</div>
+      <h1>GATE MESSAGE</h1>
+      <p>GATE SQUARE COMMUNICATION</p>
+    </div>
+
+    <div id="loginForm">
+      <label>メールアドレス</label>
+      <input id="loginEmail" type="email"
+        placeholder="メールアドレス" autocomplete="username">
+
+      <label>パスワード</label>
+      <input id="loginPassword" type="password"
+        placeholder="パスワード" autocomplete="current-password">
+
+      <button class="primary-btn" id="loginButton"
+        type="button" onclick="login()">
+        ログイン
+      </button>
+
+      <div class="auth-switch" id="showSignup">
+        アカウントを新規登録する
+      </div>
+    </div>
+
+    <div id="signupForm" class="hidden">
+      <label>表示名</label>
+      <input id="signupName" type="text" maxlength="40"
+        placeholder="あなたの名前">
+
+      <label>メールアドレス</label>
+      <input id="signupEmail" type="email"
+        placeholder="メールアドレス">
+
+      <label>パスワード（6文字以上）</label>
+      <input id="signupPassword" type="password"
+        placeholder="パスワード">
+
+      <button class="primary-btn" id="signupButton"
+        type="button" onclick="signup()">
+        アカウントを作成
+      </button>
+
+      <div class="auth-switch" id="showLogin">
+        ログイン画面に戻る
+      </div>
+    </div>
+
+    <div id="authMessage" class="message"></div>
+  </div>
+</section>
+
+<section id="appScreen" class="app hidden">
+
+  <header class="header">
+    <div class="header-brand">✉ <span>GATE</span> MESSAGE</div>
+    <div class="header-user">
+      <span id="headerName">ユーザー</span>
+      <button id="logoutButton" type="button">ログアウト</button>
+    </div>
+  </header>
+
+  <main class="main" id="mainLayout">
+
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-title">メッセージ</div>
+        <input id="userSearch" class="search-box"
+          type="text" placeholder="ユーザー名を検索...">
+        <div id="searchResults" class="search-results"></div>
+      </div>
+
+      <div class="section-heading">CHATS / トーク一覧</div>
+
+      <div id="conversationList" class="conversation-list">
+        <div style="padding:20px;color:#8793a6">
+          トークを読み込み中...
+        </div>
+      </div>
+    </aside>
+
+    <section class="chat">
+
+      <div id="chatEmpty" class="chat-empty">
+        <div class="big-icon">✉</div>
+        <strong>GATE MESSAGE</strong>
+        <p>ユーザーを検索して会話を始めてください。</p>
+      </div>
+
+      <div id="chatContent" class="hidden"
+        style="flex:1;min-height:0;flex-direction:column">
+
+        <div class="chat-header">
+          <button class="back-btn" id="backButton">戻る</button>
+          <div class="avatar" id="chatAvatar">G</div>
+          <div class="chat-header-info">
+            <strong id="chatTitle">トーク</strong>
+            <small>GATE MESSAGE</small>
+          </div>
+        </div>
+
+        <div id="messages" class="messages"></div>
+
+        <div class="input-area">
+          <textarea id="messageInput"
+            placeholder="メッセージを入力..."
+            maxlength="10000" rows="1"></textarea>
+          <button class="send-btn" id="sendButton">➤</button>
+        </div>
+
+      </div>
+
+      <div class="status" id="statusBar">
+        GATE MESSAGE / SECURE CHAT
+      </div>
+    </section>
+
+  </main>
+</section>
+
+<script>
+"use strict";
+
+/* ======================================
+   SUPABASE
+====================================== */
+
+const SUPABASE_URL =
+  "https://hxrtpftlklgwesvanlpk.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ";
+
+let db = null;
+
+let currentUser = null;
+let currentProfile = null;
+let currentConversation = null;
+let currentConversationName = "";
+
+let conversationsCache = [];
+let messageSubscription = null;
+
+let loginRunning = false;
+let signupRunning = false;
+let appReadyUserId = null;
+let searchTimer = null;
+let signingOut = false;
+let initPromise = null;
+
+const $ = id => document.getElementById(id);
+
+
+/* ======================================
+   初期画面
+====================================== */
+
+function showAuthMessage(message, isError = false) {
+  $("authMessage").textContent = message || "";
+  $("authMessage").style.color =
+    isError ? "#e55364" : "#19a879";
+}
+
+function showLoginScreen(message = "") {
+  $("appScreen").classList.add("hidden");
+  $("authScreen").classList.remove("hidden");
+  showAuthMessage(message);
+}
+
+function showAppScreen() {
+  $("authScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+}
+
+function setStatus(message) {
+  $("statusBar").textContent = message;
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[c]);
+}
+
+function initial(value) {
+  return (value || "G").trim().charAt(0).toUpperCase();
+}
+
+function timeText(value) {
+  if (!value) return "";
+
+  return new Date(value).toLocaleTimeString("ja-JP", {
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+
+/* ======================================
+   SUPABASE起動
+====================================== */
+
+function initializeSupabase() {
+  if (!window.supabase ||
+      typeof window.supabase.createClient !== "function") {
+    throw new Error(
+      "Supabaseライブラリを読み込めません。インターネット接続を確認してください。"
+    );
+  }
+
+  db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
   );
 }
-</script>
 
+
+/* ======================================
+   プロフィール
+====================================== */
+
+async function ensureProfile(user, preferredName = "") {
+  if (!user) {
+    throw new Error("ユーザー情報がありません。");
+  }
+
+  currentUser = user;
+
+  const {data,error} = await db
+    .from("profiles")
+    .select("id,display_name")
+    .eq("id",user.id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error("プロフィール取得エラー: " + error.message);
+  }
+
+  if (data) {
+    currentProfile = data;
+  } else {
+    const name =
+      preferredName ||
+      user.user_metadata?.display_name ||
+      user.user_metadata?.full_name ||
+      user.email?.split("@")[0] ||
+      "ユーザー";
+
+    const {data:created,error:createError} = await db
+      .from("profiles")
+      .upsert({
+        id:user.id,
+        display_name:name
+      },{onConflict:"id"})
+      .select("id,display_name")
+      .single();
+
+    if (createError) {
+      throw new Error("プロフィール登録エラー: " + createError.message);
+    }
+
+    currentProfile = created;
+  }
+
+  $("headerName").textContent =
+    currentProfile.display_name || "ユーザー";
+}
+
+
+/* ======================================
+   アプリ起動
+====================================== */
+
+async function activateApplication(user, preferredName = "") {
+  if (!user) {
+    throw new Error("ログイン情報が取得できません。");
+  }
+
+  if (appReadyUserId === user.id) {
+    showAppScreen();
+    return;
+  }
+
+  currentUser = user;
+
+  await ensureProfile(user,preferredName);
+
+  showAppScreen();
+
+  await loadConversations();
+
+  appReadyUserId = user.id;
+
+  setStatus("GATE MESSAGE / SECURE CHAT");
+}
+
+
+/* ======================================
+   ログイン
+====================================== */
+
+async function login() {
+  if (!db) {
+    showAuthMessage("Supabaseが起動していません。ページを再読み込みしてください。",true);
+    return;
+  }
+
+  if (loginRunning) return;
+
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
+
+  if (!email || !password) {
+    showAuthMessage("メールアドレスとパスワードを入力してください。",true);
+    return;
+  }
+
+  loginRunning = true;
+
+  const button = $("loginButton");
+  button.disabled = true;
+  button.textContent = "ログイン中...";
+
+  showAuthMessage("ログインしています...");
+
+  try {
+    const {data,error} = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    if (!data.user || !data.session) {
+      throw new Error("ログインセッションを取得できませんでした。");
+    }
+
+    await activateApplication(data.user);
+
+    $("loginPassword").value = "";
+    showAuthMessage("");
+
+  } catch (error) {
+    console.error("LOGIN ERROR:",error);
+
+    showAuthMessage(
+      "ログインエラー: " + error.message,
+      true
+    );
+
+  } finally {
+    loginRunning = false;
+    button.disabled = false;
+    button.textContent = "ログイン";
+  }
+}
+
+window.login = login;
+
+
+/* ======================================
+   新規登録
+====================================== */
+
+async function signup() {
+  if (!db || signupRunning) return;
+
+  const name = $("signupName").value.trim();
+  const email = $("signupEmail").value.trim();
+  const password = $("signupPassword").value;
+
+  if (!name || !email || !password) {
+    showAuthMessage("すべての項目を入力してください。",true);
+    return;
+  }
+
+  if (password.length < 6) {
+    showAuthMessage("パスワードは6文字以上にしてください。",true);
+    return;
+  }
+
+  signupRunning = true;
+
+  const button = $("signupButton");
+  button.disabled = true;
+  button.textContent = "登録中...";
+
+  try {
+    const {data,error} = await db.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{
+          display_name:name,
+          full_name:name
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.session && data.user) {
+      await activateApplication(data.user,name);
+      showAuthMessage("");
+    } else {
+      showAuthMessage(
+        "登録が完了しました。確認メールが届いた場合は、メール認証後にログインしてください。"
+      );
+    }
+
+  } catch (error) {
+    console.error("SIGNUP ERROR:",error);
+    showAuthMessage("登録エラー: " + error.message,true);
+
+  } finally {
+    signupRunning = false;
+    button.disabled = false;
+    button.textContent = "アカウントを作成";
+  }
+}
+
+window.signup = signup;
+
+
+/* ======================================
+   画面切り替え
+====================================== */
+
+$("showSignup").addEventListener("click",() => {
+  $("loginForm").classList.add("hidden");
+  $("signupForm").classList.remove("hidden");
+  showAuthMessage("");
+});
+
+$("showLogin").addEventListener("click",() => {
+  $("signupForm").classList.add("hidden");
+  $("loginForm").classList.remove("hidden");
+  showAuthMessage("");
+});
+
+$("loginPassword").addEventListener("keydown",event => {
+  if (event.key === "Enter") login();
+});
+
+$("loginEmail").addEventListener("keydown",event => {
+  if (event.key === "Enter") $("loginPassword").focus();
+});
+
+
+/* ======================================
+   ユーザー検索
+====================================== */
+
+$("userSearch").addEventListener("input",() => {
+  clearTimeout(searchTimer);
+
+  const keyword = $("userSearch").value.trim();
+
+  searchTimer = setTimeout(() => {
+    searchUsers(keyword);
+  },350);
+});
+
+async function searchUsers(keyword) {
+  const results = $("searchResults");
+
+  if (!keyword) {
+    results.innerHTML = "";
+    return;
+  }
+
+  if (!currentUser) return;
+
+  results.textContent = "検索中...";
+
+  const {data,error} = await db
+    .from("profiles")
+    .select("id,display_name")
+    .neq("id",currentUser.id)
+    .ilike("display_name","%" + keyword + "%")
+    .order("display_name")
+    .limit(20);
+
+  if (error) {
+    results.textContent = "検索エラー: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    results.textContent = "ユーザーが見つかりません。";
+    return;
+  }
+
+  results.innerHTML = data.map(user => `
+    <div class="user-result"
+      data-id="${escapeHTML(user.id)}"
+      data-name="${escapeHTML(user.display_name)}">
+
+      <div class="avatar">${escapeHTML(initial(user.display_name))}</div>
+
+      <div class="user-result-info">
+        <strong>${escapeHTML(user.display_name)}</strong>
+        <small>GATE MESSAGE USER</small>
+      </div>
+      <span>＋</span>
+    </div>
+  `).join("");
+
+  results.querySelectorAll(".user-result").forEach(item => {
+    item.addEventListener("click",() => {
+      startDirectChat(item.dataset.id,item.dataset.name);
+    });
+  });
+}
+
+
+/* ======================================
+   1対1トーク
+====================================== */
+
+async function startDirectChat(otherId,otherName) {
+  try {
+    setStatus("トークを準備しています...");
+
+    const {data,error} = await db.rpc("gm_start_direct_chat",{
+      p_other_user_id:otherId
+    });
+
+    if (error) throw error;
+
+    if (!data) throw new Error("トークIDを取得できません。");
+
+    $("userSearch").value = "";
+    $("searchResults").innerHTML = "";
+
+    await loadConversations();
+    await openConversation(data,otherName);
+
+    setStatus("GATE MESSAGE / SECURE CHAT");
+
+  } catch (error) {
+    console.error(error);
+    alert("トーク開始エラー: " + error.message);
+  }
+}
+
+
+/* ======================================
+   トーク一覧
+====================================== */
+
+async function loadConversations() {
+  if (!currentUser) return;
+
+  const list = $("conversationList");
+
+  const {data:memberships,error} = await db
+    .from("gm_conversation_members")
+    .select("conversation_id")
+    .eq("user_id",currentUser.id);
+
+  if (error) {
+    list.textContent = "トーク一覧エラー: " + error.message;
+    return;
+  }
+
+  if (!memberships?.length) {
+    conversationsCache = [];
+    list.textContent = "まだトークはありません。";
+    return;
+  }
+
+  const ids = memberships.map(x => x.conversation_id);
+
+  const {data:conversations,error:conversationError} = await db
+    .from("gm_conversations")
+    .select("id,conversation_type,title,created_at")
+    .in("id",ids)
+    .order("created_at",{ascending:false});
+
+  if (conversationError) throw conversationError;
+
+  const {data:members,error:memberError} = await db
+    .from("gm_conversation_members")
+    .select("conversation_id,user_id")
+    .in("conversation_id",ids);
+
+  if (memberError) throw memberError;
+
+  const otherIds = [...new Set(
+    (members || [])
+      .filter(m => m.user_id !== currentUser.id)
+      .map(m => m.user_id)
+  )];
+
+  let profiles = [];
+
+  if (otherIds.length) {
+    const {data,error:profileError} = await db
+      .from("profiles")
+      .select("id,display_name")
+      .in("id",otherIds);
+
+    if (profileError) throw profileError;
+
+    profiles = data || [];
+  }
+
+  const {data:latestMessages,error:messageError} = await db
+    .from("gm_messages")
+    .select("conversation_id,content,created_at")
+    .in("conversation_id",ids)
+    .order("created_at",{ascending:false})
+    .limit(200);
+
+  if (messageError) throw messageError;
+
+  conversationsCache = (conversations || []).map(c => {
+    const other = (members || []).find(
+      m => m.conversation_id === c.id &&
+      m.user_id !== currentUser.id
+    );
+
+    const profile = profiles.find(p => p.id === other?.user_id);
+
+    const latest = (latestMessages || []).find(
+      m => m.conversation_id === c.id
+    );
+
+    return {
+      ...c,
+      name:c.conversation_type === "group"
+        ? c.title || "グループ"
+        : profile?.display_name || "ユーザー",
+      lastMessage:latest?.content || "メッセージはありません",
+      lastTime:latest?.created_at || c.created_at
+    };
+  });
+
+  renderConversationList();
+}
+
+
+/* ======================================
+   トーク一覧描画
+====================================== */
+
+function renderConversationList() {
+  const list = $("conversationList");
+
+  if (!conversationsCache.length) {
+    list.textContent = "トークはありません。";
+    return;
+  }
+
+  list.innerHTML = conversationsCache.map(c => `
+    <div class="conversation-item ${currentConversation === c.id ? "active" : ""}"
+      data-id="${escapeHTML(c.id)}"
+      data-name="${escapeHTML(c.name)}">
+
+      <div class="avatar">${escapeHTML(initial(c.name))}</div>
+
+      <div class="conversation-info">
+        <strong>${escapeHTML(c.name)}</strong>
+        <small>${escapeHTML(c.lastMessage)}</small>
+      </div>
+
+      <small>${escapeHTML(timeText(c.lastTime))}</small>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".conversation-item").forEach(item => {
+    item.addEventListener("click",() => {
+      openConversation(item.dataset.id,item.dataset.name);
+    });
+  });
+}
+
+
+/* ======================================
+   トーク画面
+====================================== */
+
+async function openConversation(id,name) {
+  currentConversation = id;
+  currentConversationName = name;
+
+  $("chatEmpty").classList.add("hidden");
+  $("chatContent").classList.remove("hidden");
+  $("chatContent").style.display = "flex";
+
+  $("chatTitle").textContent = name;
+  $("chatAvatar").textContent = initial(name);
+
+  $("mainLayout").classList.add("chat-open");
+
+  renderConversationList();
+
+  await loadMessages();
+  subscribeMessages(id);
+}
+
+
+/* ======================================
+   メッセージ取得
+====================================== */
+
+async function loadMessages() {
+  if (!currentConversation) return;
+
+  const id = currentConversation;
+  const box = $("messages");
+
+  const {data,error} = await db
+    .from("gm_messages")
+    .select("id,conversation_id,sender_id,content,created_at")
+    .eq("conversation_id",id)
+    .order("created_at",{ascending:true})
+    .limit(500);
+
+  if (error) {
+    box.textContent = "メッセージ取得エラー: " + error.message;
+    return;
+  }
+
+  if (currentConversation !== id) return;
+
+  renderMessages(data || []);
+}
+
+
+/* ======================================
+   メッセージ描画
+====================================== */
+
+function renderMessages(messages) {
+  const box = $("messages");
+
+  if (!messages.length) {
+    box.innerHTML =
+      '<div style="margin:auto;color:#8793a6">会話を始めましょう！</div>';
+    return;
+  }
+
+  box.innerHTML = messages.map(m => {
+    const mine = m.sender_id === currentUser.id;
+
+    return `
+      <div class="message-row ${mine ? "mine" : ""}">
+        ${mine ? "" : `
+          <div class="message-sender">
+            ${escapeHTML(currentConversationName)}
+          </div>
+        `}
+
+        <div class="bubble">${escapeHTML(m.content)}</div>
+
+        <div class="message-time">
+          ${escapeHTML(timeText(m.created_at))}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  box.scrollTop = box.scrollHeight;
+}
+
+
+/* ======================================
+   メッセージ送信
+====================================== */
+
+async function sendMessage() {
+  if (!currentUser || !currentConversation) return;
+
+  const input = $("messageInput");
+  const button = $("sendButton");
+  const content = input.value.trim();
+
+  if (!content) return;
+
+  const id = currentConversation;
+
+  button.disabled = true;
+
+  try {
+    const {error} = await db
+      .from("gm_messages")
+      .insert({
+        conversation_id:id,
+        sender_id:currentUser.id,
+        content
+      });
+
+    if (error) throw error;
+
+    input.value = "";
+
+    if (currentConversation === id) {
+      await loadMessages();
+    }
+
+    await loadConversations();
+
+  } catch (error) {
+    alert("送信エラー: " + error.message);
+  } finally {
+    button.disabled = false;
+    input.focus();
+  }
+}
+
+$("sendButton").addEventListener("click",sendMessage);
+
+$("messageInput").addEventListener("keydown",event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
+
+/* ======================================
+   リアルタイム
+====================================== */
+
+function unsubscribeMessages() {
+  if (messageSubscription && db) {
+    db.removeChannel(messageSubscription);
+  }
+
+  messageSubscription = null;
+}
+
+function subscribeMessages(id) {
+  unsubscribeMessages();
+
+  messageSubscription = db
+    .channel("gm-chat-" + id)
+    .on(
+      "postgres_changes",
+      {
+        event:"INSERT",
+        schema:"public",
+        table:"gm_messages",
+        filter:"conversation_id=eq." + id
+      },
+      async payload => {
+        if (currentConversation !== id) return;
+
+        if (payload.new.sender_id === currentUser.id) return;
+
+        await loadMessages();
+        await loadConversations();
+      }
+    )
+    .subscribe();
+}
+
+
+/* ======================================
+   戻る
+====================================== */
+
+$("backButton").addEventListener("click",() => {
+  $("mainLayout").classList.remove("chat-open");
+
+  unsubscribeMessages();
+
+  currentConversation = null;
+  currentConversationName = "";
+
+  $("chatContent").classList.add("hidden");
+  $("chatContent").style.display = "none";
+
+  $("chatEmpty").classList.remove("hidden");
+
+  renderConversationList();
+});
+
+
+/* ======================================
+   ログアウト
+====================================== */
+
+$("logoutButton").addEventListener("click",async () => {
+  if (!confirm("ログアウトしますか？")) return;
+
+  signingOut = true;
+  unsubscribeMessages();
+
+  try {
+    const {error} = await db.auth.signOut();
+
+    if (error) throw error;
+
+    currentUser = null;
+    currentProfile = null;
+    currentConversation = null;
+    currentConversationName = "";
+    appReadyUserId = null;
+    conversationsCache = [];
+
+    showLoginScreen("ログアウトしました。");
+
+  } catch (error) {
+    alert("ログアウトエラー: " + error.message);
+  } finally {
+    signingOut = false;
+  }
+});
+
+
+/* ======================================
+   認証状態監視
+====================================== */
+
+async function initializePage() {
+  try {
+    initializeSupabase();
+
+    const {data,error} = await db.auth.getSession();
+
+    if (error) throw error;
+
+    if (data.session?.user) {
+      await activateApplication(data.session.user);
+    } else {
+      showLoginScreen("");
+    }
+
+    db.auth.onAuthStateChange((event,session) => {
+      if (event === "INITIAL_SESSION") return;
+
+      setTimeout(async () => {
+        if (session?.user) {
+          if (appReadyUserId !== session.user.id) {
+            try {
+              await activateApplication(session.user);
+            } catch (error) {
+              console.error(error);
+              showLoginScreen(
+                "初期化エラー: " + error.message
+              );
+            }
+          }
+        } else if (!signingOut) {
+          currentUser = null;
+          currentProfile = null;
+          currentConversation = null;
+          currentConversationName = "";
+          appReadyUserId = null;
+
+          unsubscribeMessages();
+
+          showLoginScreen("");
+        }
+      },0);
+    });
+
+  } catch (error) {
+    console.error("INITIALIZATION ERROR:",error);
+
+    showLoginScreen(
+      "起動エラー: " + error.message
+    );
+  }
+}
+
+
+/* ======================================
+   エラー表示
+====================================== */
+
+window.addEventListener("error",event => {
+  console.error("JAVASCRIPT ERROR:",event.error || event.message);
+
+  if (!$("appScreen").classList.contains("hidden")) {
+    setStatus("JavaScriptエラーが発生しました。");
+  } else {
+    showAuthMessage(
+      "ページの処理でエラーが発生しました: " + event.message,
+      true
+    );
+  }
+});
+
+window.addEventListener("unhandledrejection",event => {
+  console.error("PROMISE ERROR:",event.reason);
+
+  const message = event.reason?.message || String(event.reason);
+
+  if ($("authScreen") && !$("authScreen").classList.contains("hidden")) {
+    showAuthMessage("処理エラー: " + message,true);
+  }
+});
+
+
+/* ======================================
+   起動
+====================================== */
+
+initializePage();
+
+</script>
 </body>
 </html>
