@@ -52,9 +52,7 @@ button{cursor:pointer}
  width:370px;min-width:300px;border-right:1px solid var(--line);
  display:flex;flex-direction:column;
 }
-.top{
- padding:20px;border-bottom:1px solid var(--line);
-}
+.top{padding:20px;border-bottom:1px solid var(--line)}
 .topline{display:flex;justify-content:space-between;align-items:center}
 .search{
  width:100%;padding:12px 14px;border:0;
@@ -357,8 +355,13 @@ async function loadConversations(){
    time:last?.created_at||c.created_at
   };
  }).filter(Boolean);
- const {data:hidden}=await db.from('gm_conversation_hidden')
+
+ const {data:hidden,error:hiddenError}=await db.from('gm_conversation_hidden')
   .select('conversation_id').eq('user_id',me.id);
+ if(hiddenError){
+  notice('非表示チャットの取得に失敗: '+hiddenError.message);
+  return;
+ }
  const hiddenIds=new Set((hidden||[]).map(x=>x.conversation_id));
  conversations=conversations.filter(c=>!hiddenIds.has(c.id));
  renderList();
@@ -479,6 +482,7 @@ function backToList(){
  $('app').classList.remove('in-chat');
  if(messagesChannel){db.removeChannel(messagesChannel);messagesChannel=null}
  current=null;
+ peer=null;
 }
 
 async function loadMessages(){
@@ -578,6 +582,7 @@ async function uploadMedia(input,type){
 }
 
 const stickers=['😀','😂','🥰','😍','😭','😎','👍','❤️','🎉','🙏','🐱','🐶','🌸','🔥','✨','💯'];
+
 function buildStickers(){
  $('stickerGrid').innerHTML='';
  stickers.forEach(s=>{
@@ -587,10 +592,12 @@ function buildStickers(){
   $('stickerGrid').appendChild(b);
  });
 }
+
 function toggleStickers(){
  const p=$('stickerPanel');
  p.style.display=p.style.display==='block'?'none':'block';
 }
+
 async function sendSticker(s){
  if(!current)return;
  const {error}=await db.from('gm_messages').insert({
@@ -601,13 +608,29 @@ async function sendSticker(s){
  $('stickerPanel').style.display='none';
 }
 
+/* メッセージ削除：自分が送信したメッセージだけを削除 */
 async function deleteMessage(id){
+ if(!current || !me)return;
  if(!confirm('このメッセージを削除しますか？'))return;
- const {error}=await db.from('gm_messages')
+
+ const {data,error}=await db.from('gm_messages')
   .update({deleted_at:new Date().toISOString()})
-  .eq('id',id).eq('sender_id',me.id);
- if(error){notice('削除できません: '+error.message);return}
- notice('削除しました');
+  .eq('id',id)
+  .eq('conversation_id',current.id)
+  .eq('sender_id',me.id)
+  .is('deleted_at',null)
+  .select('id')
+  .maybeSingle();
+
+ if(error){
+  notice('削除できません: '+error.message+'（SupabaseのUPDATEポリシーを確認してください）');
+  return;
+ }
+ if(!data){
+  notice('削除されませんでした。対象メッセージがないか、UPDATE権限がありません。');
+  return;
+ }
+ notice('メッセージを削除しました');
  await loadMessages();
 }
 
@@ -621,23 +644,47 @@ async function reactMessage(id){
  else notice('リアクションしました');
 }
 
+/* チャット非表示：自分の一覧だけから非表示にする */
 async function hideConversation(){
- if(!current)return;
+ if(!current || !me)return;
  if(!confirm('自分のチャット一覧から削除しますか？相手の画面からは削除されません。'))return;
- const {error}=await db.from('gm_conversation_hidden').upsert({
-  conversation_id:current.id,user_id:me.id
- });
- if(error){notice(error.message);return}
+
+ const conversationId=current.id;
+
+ const {data:existing,error:checkError}=await db.from('gm_conversation_hidden')
+  .select('conversation_id')
+  .eq('conversation_id',conversationId)
+  .eq('user_id',me.id)
+  .maybeSingle();
+
+ if(checkError){
+  notice('非表示状態を確認できません: '+checkError.message);
+  return;
+ }
+
+ if(!existing){
+  const {error:insertError}=await db.from('gm_conversation_hidden').insert({
+   conversation_id:conversationId,
+   user_id:me.id,
+   hidden_at:new Date().toISOString()
+  });
+  if(insertError){
+   notice('チャットを非表示にできません: '+insertError.message);
+   return;
+  }
+ }
+
  $('userPanel').classList.add('hidden');
  backToList();
  await loadConversations();
- notice('チャットを非表示にしました');
+ notice('チャットを自分の一覧から非表示にしました');
 }
 
 async function toggleBlock(){
  if(!peer?.id)return;
  const isBlocked=blockedUsers.has(peer.id);
  if(!confirm(isBlocked?'ブロックを解除しますか？':'このユーザーをブロックしますか？'))return;
+
  if(isBlocked){
   const {error}=await db.from('gm_blocks')
    .delete().eq('blocker_id',me.id).eq('blocked_id',peer.id);
@@ -658,6 +705,7 @@ async function toggleBlock(){
 function toggleMenu(){
  $('userPanel').classList.toggle('hidden');
 }
+
 async function logout(){
  if(messagesChannel)await db.removeChannel(messagesChannel);
  if(listChannel)await db.removeChannel(listChannel);
@@ -670,6 +718,7 @@ buildStickers();
 db.auth.getSession().then(({data})=>{
  if(data.session)startApp(data.session.user);
 });
+
 db.auth.onAuthStateChange((event,session)=>{
  if(event==='SIGNED_OUT'){
   me=null;
