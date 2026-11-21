@@ -487,4 +487,836 @@ async function showFriendCode(){
   '<input id="friendCodeInput" placeholder="友だちコード">'+
   '<button class="primary" onclick="addFriend()">友だちを追加</button>'+
   '<p style="font-size:12px;color:var(--muted)">QRコード読み取りは、相手のコードを入力して追加してください。</p>');
- $('qrCode')
+ $('qrCode').innerHTML='';
+ new QRCode($('qrCode'),{text:code,width:170,height:170});
+}
+function copyCode(){
+ if(!me.friend_code){notice('コードがありません');return}
+ navigator.clipboard.writeText(me.friend_code)
+  .then(()=>notice('友だちコードをコピーしました'))
+  .catch(()=>notice('コピーできませんでした'));
+}
+async function addFriend(){
+ const code=$('friendCodeInput').value.trim();
+ if(!code){notice('友だちコードを入力してください');return}
+ const {data,error}=await db.rpc('gm_add_friend_by_code',{p_code:code});
+ if(error){notice('友だち追加エラー: '+error.message);return}
+ closeModal();
+ await loadFriends();
+ showFriends();
+ notice('友だちを追加しました');
+}
+
+async function hideFriend(p){
+ if(!confirm(p.display_name+'を自分の友だち一覧から非表示にしますか？'))return;
+ const {error}=await db.from('gm_friend_hidden').upsert({
+  user_id:me.id,
+  friend_id:p.id,
+  hidden_at:new Date().toISOString()
+ },{onConflict:'user_id,friend_id'});
+ if(error){notice(error.message);return}
+ await loadFriends();
+ renderFriends();
+ notice('友だちを非表示にしました');
+}
+
+async function removeFriend(p){
+ if(!confirm(p.display_name+'の友だち登録を自分側から削除しますか？'))return;
+ const {error}=await db.rpc('gm_remove_friend',{p_friend_id:p.id});
+ if(error){notice(error.message);return}
+ await loadFriends();
+ renderFriends();
+ notice('友だち登録を削除しました');
+}
+
+async function blockFriend(p){
+ if(!confirm(p.display_name+'をブロックしますか？'))return;
+ const {error}=await db.from('gm_blocks').upsert({
+  blocker_id:me.id,
+  blocked_id:p.id
+ });
+ if(error){notice(error.message);return}
+ blockedUsers.add(p.id);
+ notice('ブロックしました');
+}
+
+async function createChat(p){
+ if(blockedUsers.has(p.id)){
+  notice('このユーザーはブロック中です');
+  return;
+ }
+ const {data:blocks}=await db.from('gm_blocks')
+  .select('blocker_id')
+  .eq('blocker_id',p.id)
+  .eq('blocked_id',me.id);
+ if(blocks?.length){
+  notice('このユーザーとはチャットできません');
+  return;
+ }
+ const {data,error}=await db.rpc('gm_start_direct_chat',{
+  p_other_user_id:p.id
+ });
+ if(error){
+  notice('チャット作成エラー: '+error.message);
+  return;
+ }
+ const id=typeof data==='string'?data:data?.id;
+ await loadConversations();
+ const c=conversations.find(x=>x.id===id)||{
+  id,
+  name:p.display_name,
+  peerId:p.id,
+  avatar_url:p.avatar_url,
+  type:'direct'
+ };
+ await openChat(c);
+}
+
+async function openChat(c){
+ current=c;
+ peer={id:c.peerId,name:c.name};
+ $('app').classList.add('in-chat');
+ $('peerName').textContent=c.name;
+ $('peerAvatar').innerHTML=avatar(c.name,c.avatar_url);
+ $('peerStatus').textContent=c.type==='group'?'グループチャット':'GATE MESSAGE';
+ $('messages').innerHTML='';
+ await loadMessages();
+
+ if(messagesChannel)await db.removeChannel(messagesChannel);
+
+ messagesChannel=db.channel('gm-room-'+c.id)
+ .on('postgres_changes',{
+  event:'INSERT',
+  schema:'public',
+  table:'gm_messages',
+  filter:'conversation_id=eq.'+c.id
+ },async payload=>{
+  await renderMessage(payload.new);
+  await markRead(payload.new);
+ })
+ .on('postgres_changes',{
+  event:'UPDATE',
+  schema:'public',
+  table:'gm_messages',
+  filter:'conversation_id=eq.'+c.id
+ },()=>loadMessages())
+ .subscribe();
+
+ await updatePeerPresence();
+}
+
+function backToList(){
+ $('app').classList.remove('in-chat');
+ if(messagesChannel){
+  db.removeChannel(messagesChannel);
+  messagesChannel=null;
+ }
+ current=null;
+ peer=null;
+}
+
+async function loadMessages(){
+ if(!current)return;
+
+ const {data,error}=await db.from('gm_messages')
+  .select('*')
+  .eq('conversation_id',current.id)
+  .order('created_at',{ascending:true});
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ $('messages').innerHTML='';
+
+ for(const m of data||[]){
+  await renderMessage(m);
+ }
+
+ $('messages').scrollTop=$('messages').scrollHeight;
+
+ for(const m of (data||[]).filter(m=>m.sender_id!==me.id&&!m.deleted_at)){
+  await markRead(m);
+ }
+}
+
+async function renderMessage(m){
+ if(!m||!current||m.conversation_id!==current.id)return;
+
+ const old=$('msg-'+m.id);
+ if(old)old.remove();
+
+ const mine=m.sender_id===me.id;
+ const row=document.createElement('div');
+ row.id='msg-'+m.id;
+ row.className='msg-row'+(mine?' mine':'');
+
+ let body='';
+
+ if(m.deleted_at){
+  body='<i>このメッセージは削除されました</i>';
+ }else if(m.message_type==='image'){
+  body='<img src="'+safe(m.media_url)+'">';
+ }else if(m.message_type==='video'){
+  body='<video controls playsinline src="'+safe(m.media_url)+'"></video>';
+ }else if(m.message_type==='sticker'){
+  body='<div class="sticker">'+safe(m.content)+'</div>';
+ }else{
+  body=safe(m.content).replace(/\n/g,'<br>');
+ }
+
+ let readText='';
+
+ if(mine){
+  const {data:reads}=await db.from('gm_message_reads')
+   .select('user_id')
+   .eq('message_id',m.id)
+   .neq('user_id',me.id);
+
+  if(reads?.length)readText='既読';
+ }
+
+ const {data:reactions}=await db.from('gm_message_reactions')
+  .select('reaction,user_id')
+  .eq('message_id',m.id);
+
+ const reactionText=(reactions||[])
+  .map(r=>safe(r.reaction)).join(' ');
+
+ row.innerHTML=
+  '<div class="bubble">'+body+'</div>'+
+  '<div class="msg-meta">'+
+  new Date(m.created_at).toLocaleTimeString('ja-JP',{
+   hour:'2-digit',
+   minute:'2-digit'
+  })+
+  (m.edited_at?' 編集':'')+' '+readText+'</div>'+
+  (reactionText?'<div>'+reactionText+'</div>':'')+
+  '<div class="msg-actions">'+
+  (mine&&!m.deleted_at?
+   '<button onclick="editMessage(\''+m.id+'\')">編集</button>'+
+   '<button onclick="deleteMessage(\''+m.id+'\')">削除</button>':'')+
+  (!m.deleted_at?
+   '<button onclick="reactMessage(\''+m.id+'\')">❤️</button>'+
+   '<button onclick="reportMessage(\''+m.id+'\')">通報</button>':'')+
+  '</div>';
+
+ $('messages').appendChild(row);
+ $('messages').scrollTop=$('messages').scrollHeight;
+}
+
+async function markRead(m){
+ if(!m||m.sender_id===me.id)return;
+
+ await db.from('gm_message_reads').upsert({
+  message_id:m.id,
+  user_id:me.id
+ },{onConflict:'message_id,user_id',ignoreDuplicates:true});
+}
+
+async function sendMessage(){
+ if(!current)return;
+
+ const text=$('messageInput').value.trim();
+ if(!text)return;
+
+ if(peer?.id&&blockedUsers.has(peer.id)){
+  notice('ブロック中です');
+  return;
+ }
+
+ if(peer?.id){
+  const {data:blocks}=await db.from('gm_blocks')
+   .select('blocker_id')
+   .eq('blocker_id',peer.id)
+   .eq('blocked_id',me.id);
+
+  if(blocks?.length){
+   notice('相手からブロックされています');
+   return;
+  }
+ }
+
+ const {error}=await db.from('gm_messages').insert({
+  conversation_id:current.id,
+  sender_id:me.id,
+  content:text,
+  message_type:'text'
+ });
+
+ if(error){
+  notice('送信できません: '+error.message);
+  return;
+ }
+
+ $('messageInput').value='';
+}
+
+async function uploadMedia(input,type){
+ const files=Array.from(input.files||[]);
+ if(!files.length||!current)return;
+
+ for(const file of files){
+  if(file.size>50*1024*1024){
+   notice('50MBを超えています');
+   continue;
+  }
+
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase();
+  const path=me.id+'/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
+
+  const {error:up}=await db.storage.from('gm-media').upload(path,file,{
+   cacheControl:'3600',
+   upsert:false,
+   contentType:file.type
+  });
+
+  if(up){
+   notice(up.message);
+   continue;
+  }
+
+  const {data}=db.storage.from('gm-media').getPublicUrl(path);
+
+  const {error}=await db.from('gm_messages').insert({
+   conversation_id:current.id,
+   sender_id:me.id,
+   content:type==='image'?'写真を送信しました':'動画を送信しました',
+   message_type:type,
+   media_url:data.publicUrl,
+   media_name:file.name
+  });
+
+  if(error)notice(error.message);
+ }
+
+ input.value='';
+ notice('送信処理が完了しました');
+}
+
+const stickers=[
+ '😀','😂','🥰','😍',
+ '😭','😎','👍','❤️',
+ '🎉','🙏','🐱','🐶',
+ '🌸','🔥','✨','💯'
+];
+
+function buildStickers(){
+ $('stickerGrid').innerHTML='';
+
+ stickers.forEach(s=>{
+  const b=document.createElement('button');
+  b.textContent=s;
+  b.style.cssText=
+   'font-size:27px;border:0;padding:8px;background:var(--bg);border-radius:8px';
+  b.onclick=()=>sendSticker(s);
+  $('stickerGrid').appendChild(b);
+ });
+}
+
+function toggleStickers(){
+ $('stickerPanel').classList.toggle('hidden');
+}
+
+async function sendSticker(s){
+ if(!current)return;
+
+ const {error}=await db.from('gm_messages').insert({
+  conversation_id:current.id,
+  sender_id:me.id,
+  content:s,
+  message_type:'sticker'
+ });
+
+ if(error)notice(error.message);
+
+ $('stickerPanel').classList.add('hidden');
+}
+
+async function editMessage(id){
+ const {data:m}=await db.from('gm_messages')
+  .select('content')
+  .eq('id',id)
+  .eq('sender_id',me.id)
+  .maybeSingle();
+
+ if(!m)return;
+
+ const value=prompt('メッセージを編集',m.content);
+ if(value===null||!value.trim())return;
+
+ const {error}=await db.from('gm_messages').update({
+  content:value.trim(),
+  edited_at:new Date().toISOString()
+ }).eq('id',id).eq('sender_id',me.id);
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ await loadMessages();
+}
+
+async function deleteMessage(id){
+ if(!confirm('このメッセージを削除しますか？'))return;
+
+ const {error}=await db.from('gm_messages').update({
+  deleted_at:new Date().toISOString()
+ }).eq('id',id).eq('sender_id',me.id);
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ await loadMessages();
+}
+
+async function reactMessage(id){
+ const reaction=prompt('リアクションを入力','❤️');
+ if(!reaction)return;
+
+ const {error}=await db.from('gm_message_reactions').insert({
+  message_id:id,
+  user_id:me.id,
+  reaction
+ });
+
+ if(error)notice(error.message);
+ else await loadMessages();
+}
+
+async function hideConversation(){
+ if(!current)return;
+
+ if(!confirm('自分の一覧から非表示にしますか？'))return;
+
+ const {error}=await db.from('gm_conversation_hidden').upsert({
+  conversation_id:current.id,
+  user_id:me.id,
+  hidden_at:new Date().toISOString()
+ },{onConflict:'conversation_id,user_id'});
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ $('userPanel').classList.add('hidden');
+ backToList();
+ await loadConversations();
+ notice('非表示にしました');
+}
+
+async function deleteConversation(){
+ if(!current)return;
+
+ if(!confirm(
+  '自分のチャット一覧から削除しますか？\n'+
+  '相手側の会話やメッセージは削除されません。'
+ ))return;
+
+ const {error}=await db.from('gm_conversation_hidden').upsert({
+  conversation_id:current.id,
+  user_id:me.id,
+  hidden_at:new Date().toISOString()
+ },{onConflict:'conversation_id,user_id'});
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ $('userPanel').classList.add('hidden');
+ backToList();
+ await loadConversations();
+ notice('自分の一覧から削除しました');
+}
+
+async function showHiddenChats(){
+ const {data,error}=await db.from('gm_conversation_hidden')
+  .select('conversation_id,gm_conversations(title,conversation_type)')
+  .eq('user_id',me.id);
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ if(!data?.length){
+  notice('非表示のチャットはありません');
+  return;
+ }
+
+ showModal('非表示チャット',(data||[]).map(x=>
+  '<div style="padding:10px;border-bottom:1px solid var(--line)">'+
+  safe(x.gm_conversations?.title||'個別チャット')+
+  ' <button class="secondary" onclick="unhideConversation(\''+
+  x.conversation_id+'\')">復元</button></div>'
+ ).join(''));
+}
+
+async function unhideConversation(id){
+ const {error}=await db.from('gm_conversation_hidden').delete()
+  .eq('conversation_id',id)
+  .eq('user_id',me.id);
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ closeModal();
+ await loadConversations();
+ notice('復元しました');
+}
+
+async function toggleBlock(){
+ if(!peer?.id){
+  notice('個別チャットで使用してください');
+  return;
+ }
+
+ const isBlocked=blockedUsers.has(peer.id);
+
+ if(!confirm(isBlocked?'ブロックを解除しますか？':'ブロックしますか？'))return;
+
+ let result;
+
+ if(isBlocked){
+  result=await db.from('gm_blocks').delete()
+   .eq('blocker_id',me.id)
+   .eq('blocked_id',peer.id);
+
+  if(!result.error)blockedUsers.delete(peer.id);
+ }else{
+  result=await db.from('gm_blocks').insert({
+   blocker_id:me.id,
+   blocked_id:peer.id
+  });
+
+  if(!result.error)blockedUsers.add(peer.id);
+ }
+
+ if(result.error){
+  notice(result.error.message);
+  return;
+ }
+
+ notice(isBlocked?'ブロックを解除しました':'ブロックしました');
+}
+
+async function editProfile(){
+ const name=prompt('表示名',me.name);
+ if(name===null||!name.trim())return;
+
+ const bio=prompt('自己紹介',me.bio||'');
+ if(bio===null)return;
+
+ const {error}=await db.from('profiles').update({
+  display_name:name.trim(),
+  bio:bio.trim()
+ }).eq('id',me.id);
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ me.name=name.trim();
+ me.bio=bio.trim();
+ $('myName').textContent=me.name;
+ notice('プロフィールを更新しました');
+}
+
+function uploadAvatar(){
+ const input=document.createElement('input');
+ input.type='file';
+ input.accept='image/*';
+
+ input.onchange=async()=>{
+  const file=input.files?.[0];
+  if(!file)return;
+
+  if(file.size>5*1024*1024){
+   notice('画像は5MB以下にしてください');
+   return;
+  }
+
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=me.id+'/avatars/'+Date.now()+'.'+ext;
+
+  const {error:up}=await db.storage.from('gm-media').upload(path,file,{
+   upsert:true,
+   contentType:file.type
+  });
+
+  if(up){
+   notice(up.message);
+   return;
+  }
+
+  const {data}=db.storage.from('gm-media').getPublicUrl(path);
+
+  const {error}=await db.from('profiles').update({
+   avatar_url:data.publicUrl
+  }).eq('id',me.id);
+
+  if(error){
+   notice(error.message);
+   return;
+  }
+
+  me.avatar_url=data.publicUrl;
+  $('myAvatar').innerHTML=avatar(me.name,me.avatar_url);
+  notice('画像を更新しました');
+ };
+
+ input.click();
+}
+
+async function createGroup(){
+ await loadFriends();
+
+ if(!friends.length){
+  notice('先に友だちを追加してください');
+  return;
+ }
+
+ let html='<input id="groupTitle" placeholder="グループ名">';
+
+ friends.forEach(p=>{
+  html+='<label style="display:block;padding:8px">'+
+   '<input type="checkbox" class="groupFriend" value="'+p.id+'" style="width:auto">'+
+   safe(p.display_name)+'</label>';
+ });
+
+ html+='<button class="primary" onclick="submitGroup()">グループを作成</button>';
+
+ showModal('グループチャット作成',html);
+}
+
+async function submitGroup(){
+ const title=$('groupTitle').value.trim();
+
+ const ids=Array.from(
+  document.querySelectorAll('.groupFriend:checked')
+ ).map(x=>x.value);
+
+ if(!title){
+  notice('グループ名を入力してください');
+  return;
+ }
+
+ if(!ids.length){
+  notice('友だちを1人以上選択してください');
+  return;
+ }
+
+ const {data,error}=await db.rpc('gm_create_group_chat',{
+  p_title:title,
+  p_member_ids:ids
+ });
+
+ if(error){
+  notice('グループ作成エラー: '+error.message);
+  return;
+ }
+
+ closeModal();
+ await loadConversations();
+
+ const c=conversations.find(x=>x.id===data);
+ if(c)await openChat(c);
+
+ notice('グループを作成しました');
+}
+
+async function showGroupMembers(){
+ if(!current||current.type!=='group'){
+  notice('グループで使用してください');
+  return;
+ }
+
+ const {data,error}=await db.from('gm_conversation_members')
+  .select('user_id,profiles(display_name)')
+  .eq('conversation_id',current.id);
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ showModal('グループメンバー',(data||[]).map(x=>
+  '<p>'+safe(x.profiles?.display_name||'ユーザー')+
+  (x.user_id===me.id?'（自分）':'')+'</p>'
+ ).join(''));
+}
+
+async function leaveGroup(){
+ if(!current||current.type!=='group'){
+  notice('グループで使用してください');
+  return;
+ }
+
+ if(!confirm('グループから退出しますか？'))return;
+
+ const {error}=await db.rpc('gm_leave_group_chat',{
+  p_conversation_id:current.id
+ });
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ backToList();
+ await loadConversations();
+ notice('退出しました');
+}
+
+async function reportUser(){
+ if(!peer?.id){
+  notice('相手を選択してください');
+  return;
+ }
+
+ const reason=prompt('通報理由');
+ if(!reason?.trim())return;
+
+ const {error}=await db.from('gm_reports').insert({
+  reporter_id:me.id,
+  reported_user_id:peer.id,
+  reason:reason.trim()
+ });
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ notice('通報を受け付けました');
+}
+
+async function reportMessage(id){
+ const reason=prompt('通報理由');
+ if(!reason?.trim())return;
+
+ const {data:m}=await db.from('gm_messages')
+  .select('sender_id')
+  .eq('id',id)
+  .maybeSingle();
+
+ const {error}=await db.from('gm_reports').insert({
+  reporter_id:me.id,
+  reported_user_id:m?.sender_id||null,
+  message_id:id,
+  reason:reason.trim()
+ });
+
+ if(error){
+  notice(error.message);
+  return;
+ }
+
+ notice('通報を受け付けました');
+}
+
+async function updatePresence(){
+ if(!me)return;
+
+ const now=new Date().toISOString();
+
+ await db.from('gm_user_presence').upsert({
+  user_id:me.id,
+  is_online:true,
+  last_seen_at:now
+ },{onConflict:'user_id'});
+
+ await db.from('profiles').update({
+  is_online:true,
+  last_seen_at:now
+ }).eq('id',me.id);
+}
+
+function startPresence(){
+ if(presenceTimer)clearInterval(presenceTimer);
+ presenceTimer=setInterval(updatePresence,30000);
+}
+
+async function updatePeerPresence(){
+ if(!peer?.id)return;
+
+ const {data}=await db.from('gm_user_presence')
+  .select('is_online,last_seen_at')
+  .eq('user_id',peer.id)
+  .maybeSingle();
+
+ if(data?.is_online){
+  $('peerStatus').innerHTML='<span class="online-dot"></span>オンライン';
+ }else{
+  $('peerStatus').textContent='GATE MESSAGE';
+ }
+}
+
+async function logout(){
+ if(presenceTimer)clearInterval(presenceTimer);
+
+ if(me){
+  const now=new Date().toISOString();
+
+  await db.from('gm_user_presence').upsert({
+   user_id:me.id,
+   is_online:false,
+   last_seen_at:now
+  },{onConflict:'user_id'});
+
+  await db.from('profiles').update({
+   is_online:false,
+   last_seen_at:now
+  }).eq('id',me.id);
+ }
+
+ if(messagesChannel)await db.removeChannel(messagesChannel);
+ if(listChannel)await db.removeChannel(listChannel);
+
+ await db.auth.signOut();
+ location.reload();
+}
+
+$('search').addEventListener('input',e=>{
+ if(viewMode==='friends'){
+  renderFriends(e.target.value);
+ }else{
+  renderList(e.target.value);
+ }
+});
+
+buildStickers();
+
+db.auth.getSession().then(({data})=>{
+ if(data.session)startApp(data.session.user);
+});
+
+db.auth.onAuthStateChange((event,session)=>{
+ if(event==='SIGNED_OUT'){
+  me=null;
+  $('app').classList.add('hidden');
+  $('login').classList.remove('hidden');
+ }
+});
+
+window.addEventListener('beforeunload',()=>{
+ if(me){
+  db.from('gm_user_presence').upsert({
+   user_id:me.id,
+   is_online:false,
+   last_seen_at:new Date().toISOString()
+  },{onConflict:'user_id'});
+ }
+});
+</script>
+</body>
+</html>
