@@ -2,3098 +2,681 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101d35">
-<title>GATE MESSAGE | GATE SQUARE</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GATE MESSAGE</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root {
-  --navy:#101d35;
-  --navy2:#192e50;
-  --cyan:#35d9f5;
-  --blue:#2385ff;
-  --bg:#f1f5fa;
-  --text:#19263c;
-  --muted:#8290a5;
-  --border:#e4eaf2;
-  --red:#e55364;
+:root{
+ --blue:#3478f6;
+ --bg:#f4f6fa;
+ --text:#172033;
+ --muted:#8792a5;
+ --line:#e8ecf2;
 }
-
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  font-family:Arial,"Noto Sans JP",sans-serif;
-  color:var(--text);
-  background:var(--bg);
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-
-button,input,textarea {
-  font:inherit;
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#login{
+ min-height:100vh;display:flex;align-items:center;
+ justify-content:center;padding:20px;
+ background:linear-gradient(140deg,#10213e,#3478f6);
 }
-
-button {
-  cursor:pointer;
+.login-card{
+ width:100%;max-width:390px;background:white;
+ padding:32px;border-radius:24px;
+ box-shadow:0 20px 70px #001b4530;
 }
-
-button:disabled {
-  opacity:.55;
-  cursor:not-allowed;
+.logo{font-size:26px;font-weight:900;letter-spacing:1px}
+.logo span{color:var(--blue)}
+.sub{color:var(--muted);font-size:13px;margin:8px 0 25px}
+.field{
+ width:100%;padding:14px;border:1px solid var(--line);
+ border-radius:12px;margin:7px 0;outline:none;
 }
-
-.hidden {
-  display:none !important;
+.field:focus{border-color:var(--blue)}
+.primary{
+ background:var(--blue);color:white;border:0;
+ padding:14px;border-radius:12px;font-weight:bold;
+ width:100%;margin-top:12px;
 }
-
-/* ログイン画面 */
-
-.auth-screen {
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:
-    radial-gradient(circle at 20% 20%,#164b72,transparent 40%),
-    linear-gradient(135deg,#0c172b,#172c4b);
+#app{
+ max-width:1300px;margin:auto;height:100dvh;
+ display:flex;background:white;overflow:hidden;
 }
-
-.auth-card {
-  width:100%;
-  max-width:430px;
-  padding:35px;
-  background:white;
-  border-radius:22px;
-  box-shadow:0 25px 70px #0005;
+.sidebar{
+ width:370px;min-width:300px;border-right:1px solid var(--line);
+ display:flex;flex-direction:column;
 }
-
-.logo {
-  text-align:center;
-  margin-bottom:28px;
+.top{
+ padding:20px;border-bottom:1px solid var(--line);
 }
-
-.logo-icon {
-  width:65px;
-  height:65px;
-  margin:auto;
-  display:grid;
-  place-items:center;
-  background:var(--navy);
-  color:var(--cyan);
-  border-radius:20px;
-  font-size:30px;
+.topline{display:flex;justify-content:space-between;align-items:center}
+.search{
+ width:100%;padding:12px 14px;border:0;
+ background:var(--bg);border-radius:12px;margin-top:18px;
+ outline:none;
 }
-
-.logo h1 {
-  margin:14px 0 5px;
-  letter-spacing:2px;
-  font-size:25px;
+.tabs{display:flex;gap:20px;margin-top:18px;font-size:13px}
+.tabs span{cursor:pointer;color:var(--muted)}
+.tabs .active{color:var(--blue);font-weight:bold}
+#chatList{overflow:auto;flex:1}
+.chat-item{
+ display:flex;align-items:center;gap:12px;
+ padding:15px 18px;cursor:pointer;
+ border-bottom:1px solid #f1f2f5;
 }
-
-.logo p {
-  color:var(--muted);
-  font-size:11px;
-  letter-spacing:2px;
+.chat-item:hover{background:#f7f9fc}
+.avatar{
+ width:48px;height:48px;flex-shrink:0;
+ border-radius:50%;background:#e3edff;
+ display:flex;align-items:center;justify-content:center;
+ color:var(--blue);font-weight:bold;font-size:19px;
 }
-
-.auth-card label {
-  display:block;
-  font-size:13px;
-  font-weight:bold;
-  margin:16px 0 7px;
+.chat-info{flex:1;min-width:0}
+.chat-name{font-weight:700;font-size:14px}
+.chat-preview{
+ color:var(--muted);font-size:12px;
+ margin-top:5px;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis;
 }
-
-.auth-card input {
-  width:100%;
-  padding:14px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  outline:none;
+.time{font-size:11px;color:var(--muted)}
+.main{
+ flex:1;display:flex;flex-direction:column;
+ min-width:0;background:white;
 }
-
-.auth-card input:focus {
-  border-color:var(--cyan);
+.chat-header{
+ height:75px;border-bottom:1px solid var(--line);
+ display:flex;align-items:center;padding:0 20px;gap:12px;
 }
-
-.primary-btn {
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  color:white;
-  font-weight:bold;
-  background:linear-gradient(100deg,#1479e9,#19bfdc);
-  margin-top:20px;
+.chat-header-info{flex:1}
+.chat-header-name{font-weight:bold}
+.chat-status{font-size:11px;color:var(--muted);margin-top:4px}
+.icon-btn{
+ border:0;background:transparent;font-size:21px;
+ padding:8px;color:#64748b;border-radius:10px;
 }
-
-.auth-switch {
-  margin-top:20px;
-  text-align:center;
-  font-size:13px;
-  color:#2586dd;
-  cursor:pointer;
+.icon-btn:hover{background:var(--bg)}
+#messages{
+ flex:1;overflow-y:auto;padding:24px;
+ display:flex;flex-direction:column;gap:13px;
+ background:#fafbfe;
 }
-
-.message {
-  font-size:13px;
-  margin-top:13px;
-  line-height:1.7;
-  overflow-wrap:anywhere;
+.day{text-align:center;color:#a1a9b7;font-size:11px;margin:10px}
+.msg-row{display:flex;flex-direction:column;max-width:75%;align-items:flex-start}
+.msg-row.mine{align-self:flex-end;align-items:flex-end}
+.bubble{
+ background:white;padding:12px 15px;border-radius:18px;
+ box-shadow:0 1px 4px #0000000a;
+ font-size:14px;line-height:1.6;overflow-wrap:anywhere;
 }
-
-/* アプリ */
-
-.app {
-  height:100dvh;
-  display:flex;
-  flex-direction:column;
-  max-width:1500px;
-  margin:auto;
-  background:white;
+.mine .bubble{
+ background:var(--blue);color:white;
+ border-bottom-right-radius:5px;
 }
-
-.header {
-  min-height:65px;
-  background:var(--navy);
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 22px;
-  border-bottom:2px solid var(--cyan);
+.msg-row:not(.mine) .bubble{border-bottom-left-radius:5px}
+.msg-meta{font-size:10px;color:#9aa3b2;margin-top:4px}
+.mine .msg-meta{text-align:right}
+.bubble img,.bubble video{
+ display:block;max-width:100%;max-height:320px;
+ border-radius:12px;
 }
-
-.header-brand {
-  font-size:19px;
-  font-weight:bold;
-  letter-spacing:1px;
+.sticker{font-size:65px;padding:8px}
+.composer{
+ border-top:1px solid var(--line);
+ padding:12px 18px 18px;background:white;
 }
-
-.header-brand span {
-  color:var(--cyan);
+.tools{display:flex;gap:8px;margin-bottom:10px}
+.tool{
+ border:0;background:#f1f4f9;color:#52617a;
+ border-radius:10px;padding:8px 12px;font-size:17px;
 }
-
-.header-user {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:13px;
+.sendline{display:flex;align-items:center;gap:10px}
+#messageInput{
+ flex:1;border:0;background:#f2f4f8;
+ border-radius:22px;padding:14px 17px;outline:none;
+ min-width:0;
 }
-
-.header-user button {
-  border:1px solid #ffffff55;
-  background:transparent;
-  color:white;
-  padding:8px 12px;
-  border-radius:8px;
+.send{
+ background:var(--blue);color:white;border:0;
+ border-radius:50%;width:44px;height:44px;font-size:18px;
 }
-
-.main {
-  display:grid;
-  grid-template-columns:340px 1fr;
-  flex:1;
-  min-height:0;
+.empty{
+ margin:auto;text-align:center;color:var(--muted);
+ padding:25px;
 }
-
-.sidebar {
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  min-height:0;
+.empty strong{display:block;color:#344158;font-size:20px;margin:10px}
+#mobileBack{display:none}
+#userPanel{
+ position:absolute;right:20px;top:70px;background:white;
+ padding:18px;border:1px solid var(--line);
+ border-radius:15px;box-shadow:0 10px 30px #0002;
+ z-index:5;min-width:210px;
 }
-
-.sidebar-top {
-  padding:20px;
-  border-bottom:1px solid var(--border);
+.menu-btn{
+ display:block;width:100%;padding:12px;text-align:left;
+ border:0;background:white;border-radius:8px;
 }
-
-.sidebar-title {
-  font-size:20px;
-  font-weight:bold;
-  margin-bottom:15px;
+.menu-btn:hover{background:var(--bg)}
+#notice{
+ position:fixed;bottom:20px;left:50%;
+ transform:translateX(-50%);background:#172033;
+ color:white;padding:12px 20px;border-radius:12px;
+ z-index:30;font-size:13px;display:none;
 }
-
-.search-box {
-  width:100%;
-  border:1px solid var(--border);
-  background:#f5f8fc;
-  padding:12px;
-  border-radius:10px;
-  outline:none;
+#stickerPanel{
+ display:none;position:absolute;bottom:100px;
+ background:white;border:1px solid var(--line);
+ box-shadow:0 5px 25px #0002;border-radius:15px;
+ padding:15px;max-width:300px;
 }
-
-.search-results {
-  margin-top:10px;
-  max-height:180px;
-  overflow:auto;
-}
-
-.user-result {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.user-result:hover {
-  background:#eef7fc;
-}
-
-.avatar {
-  width:42px;
-  height:42px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  color:white;
-  font-weight:bold;
-  background:linear-gradient(135deg,#176fbd,#31c8df);
-}
-
-.user-result-info {
-  min-width:0;
-  flex:1;
-}
-
-.user-result-info strong {
-  display:block;
-  font-size:14px;
-}
-
-.user-result-info small {
-  color:var(--muted);
-  font-size:11px;
-}
-
-.section-heading {
-  padding:17px 20px 8px;
-  font-size:12px;
-  font-weight:bold;
-  color:var(--muted);
-  letter-spacing:1px;
-}
-
-.conversation-list {
-  overflow:auto;
-  flex:1;
-}
-
-.conversation-item {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:14px 18px;
-  cursor:pointer;
-  border-bottom:1px solid #f0f3f7;
-}
-
-.conversation-item:hover {
-  background:#f4f8fc;
-}
-
-.conversation-item.active {
-  background:#eaf7fc;
-  border-left:4px solid var(--cyan);
-  padding-left:14px;
-}
-
-.conversation-info {
-  flex:1;
-  min-width:0;
-}
-
-.conversation-info strong {
-  display:block;
-  font-size:14px;
-  margin-bottom:5px;
-}
-
-.conversation-info small {
-  color:var(--muted);
-  font-size:12px;
-  display:block;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-}
-
-.chat {
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-  min-height:0;
-}
-
-.chat-empty {
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  color:var(--muted);
-  text-align:center;
-  padding:25px;
-}
-
-.big-icon {
-  font-size:60px;
-  color:#b6d8e9;
-  margin-bottom:15px;
-}
-
-.chat-header {
-  padding:16px 22px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border-bottom:1px solid var(--border);
-  min-height:75px;
-}
-
-.chat-header-info {
-  flex:1;
-}
-
-.chat-header-info strong {
-  display:block;
-  font-size:16px;
-}
-
-.chat-header-info small {
-  color:var(--muted);
-  font-size:12px;
-}
-
-.messages {
-  flex:1;
-  overflow-y:auto;
-  padding:24px;
-  background:#f7f9fc;
-  display:flex;
-  flex-direction:column;
-  gap:13px;
-}
-
-.message-row {
-  display:flex;
-  flex-direction:column;
-  max-width:75%;
-  align-self:flex-start;
-}
-
-.message-row.mine {
-  align-self:flex-end;
-  align-items:flex-end;
-}
-
-.message-sender {
-  font-size:11px;
-  color:var(--muted);
-  margin:0 5px 5px;
-}
-
-.bubble {
-  padding:12px 15px;
-  border-radius:16px;
-  background:white;
-  box-shadow:0 2px 7px #10243b0c;
-  font-size:14px;
-  line-height:1.65;
-  overflow-wrap:anywhere;
-  white-space:pre-wrap;
-}
-
-.mine .bubble {
-  background:#d9f7ff;
-  border-bottom-right-radius:4px;
-}
-
-.message-time {
-  color:#a1aabb;
-  font-size:10px;
-  margin:4px 5px 0;
-}
-
-.input-area {
-  padding:15px 20px;
-  border-top:1px solid var(--border);
-  display:flex;
-  align-items:flex-end;
-  gap:10px;
-}
-
-.input-area textarea {
-  flex:1;
-  min-height:45px;
-  max-height:120px;
-  resize:none;
-  padding:13px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  outline:none;
-  font-size:14px;
-}
-
-.send-btn {
-  width:48px;
-  height:45px;
-  border:0;
-  border-radius:12px;
-  color:white;
-  background:linear-gradient(135deg,#1684eb,#20c6df);
-  font-size:20px;
-}
-
-.status {
-  padding:7px 12px;
-  font-size:11px;
-  color:var(--muted);
-  background:#f7f9fc;
-  border-top:1px solid var(--border);
-}
-
-.back-btn {
-  display:none;
-  border:0;
-  background:#edf4fa;
-  padding:9px 12px;
-  border-radius:8px;
-}
-
-@media(max-width:700px) {
-  .header {
-    padding:0 12px;
-    min-height:58px;
-  }
-
-  .header-brand {
-    font-size:15px;
-  }
-
-  .header-user {
-    gap:6px;
-    font-size:11px;
-  }
-
-  .header-user button {
-    padding:7px;
-    font-size:11px;
-  }
-
-  .main {
-    grid-template-columns:1fr;
-  }
-
-  .chat {
-    display:none;
-  }
-
-  .main.chat-open .sidebar {
-    display:none;
-  }
-
-  .main.chat-open .chat {
-    display:flex;
-  }
-
-  .back-btn {
-    display:block;
-  }
-
-  .messages {
-    padding:16px 12px;
-  }
-
-  .message-row {
-    max-width:85%;
-  }
-
-  .input-area {
-    padding:10px;
-  }
-
-  .auth-card {
-    padding:25px;
-  }
+.sticker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sticker-grid button{font-size:30px;border:0;background:#f5f7fa;border-radius:10px;padding:7px}
+@media(max-width:700px){
+ #app{height:100dvh}
+ .sidebar{width:100%;min-width:0;border:0}
+ .main{display:none;width:100%}
+ #app.in-chat .sidebar{display:none}
+ #app.in-chat .main{display:flex}
+ #mobileBack{display:block}
+ .chat-header{height:65px;padding:0 10px}
+ #messages{padding:15px}
+ .msg-row{max-width:86%}
+ .composer{padding:10px}
+ .top{padding:16px}
 }
 </style>
 </head>
-
 <body>
 
-<section id="authScreen" class="auth-screen">
-  <div class="auth-card">
+<section id="login">
+ <div class="login-card">
+  <div class="logo">GATE <span>MESSAGE</span></div>
+  <div class="sub">Connect with everyone.</div>
+  <input id="email" class="field" type="email" placeholder="メールアドレス">
+  <input id="password" class="field" type="password" placeholder="パスワード">
+  <button class="primary" onclick="login()">ログイン</button>
+  <p id="loginError" style="color:#e44;font-size:12px"></p>
+ </div>
+</section>
 
-    <div class="logo">
-      <div class="logo-icon">✉</div>
-      <h1>GATE MESSAGE</h1>
-      <p>GATE SQUARE COMMUNICATION</p>
-    </div>
-
-    <div id="loginForm">
-      <label>メールアドレス</label>
-      <input id="loginEmail" type="email"
-        placeholder="メールアドレス" autocomplete="username">
-
-      <label>パスワード</label>
-      <input id="loginPassword" type="password"
-        placeholder="パスワード" autocomplete="current-password">
-
-      <button class="primary-btn" id="loginButton"
-        type="button" onclick="login()">
-        ログイン
-      </button>
-
-      <div class="auth-switch" id="showSignup">
-        アカウントを新規登録する
-      </div>
-    </div>
-
-    <div id="signupForm" class="hidden">
-      <label>表示名</label>
-      <input id="signupName" type="text" maxlength="40"
-        placeholder="あなたの名前">
-
-      <label>メールアドレス</label>
-      <input id="signupEmail" type="email"
-        placeholder="メールアドレス">
-
-      <label>パスワード（6文字以上）</label>
-      <input id="signupPassword" type="password"
-        placeholder="パスワード">
-
-      <button class="primary-btn" id="signupButton"
-        type="button" onclick="signup()">
-        アカウントを作成
-      </button>
-
-      <div class="auth-switch" id="showLogin">
-        ログイン画面に戻る
-      </div>
-    </div>
-
-    <div id="authMessage" class="message"></div>
+<div id="app" class="hidden">
+ <aside class="sidebar">
+  <div class="top">
+   <div class="topline">
+    <div class="logo">GATE <span>MESSAGE</span></div>
+    <button class="icon-btn" onclick="newChat()">＋</button>
+   </div>
+   <input class="search" id="search" placeholder="ユーザー・チャットを検索" oninput="searchAll()">
+   <div class="tabs">
+    <span class="active">すべて</span>
+    <span onclick="newChat()">友だちを探す ＋</span>
+   </div>
   </div>
-</section>
+  <div id="chatList"></div>
+  <div style="padding:14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px">
+   <div class="avatar" id="myAvatar">G</div>
+   <div style="flex:1;min-width:0">
+    <b id="myName">ユーザー</b>
+    <div style="font-size:11px;color:var(--muted)">GATE MESSAGE</div>
+   </div>
+   <button class="icon-btn" onclick="toggleMenu()">⚙</button>
+  </div>
+ </aside>
 
-<section id="appScreen" class="app hidden">
-
-  <header class="header">
-    <div class="header-brand">✉ <span>GATE</span> MESSAGE</div>
-    <div class="header-user">
-      <span id="headerName">ユーザー</span>
-      <button id="logoutButton" type="button">ログアウト</button>
-    </div>
+ <main class="main">
+  <header class="chat-header">
+   <button class="icon-btn" id="mobileBack" onclick="backToList()">‹</button>
+   <div class="avatar" id="peerAvatar">G</div>
+   <div class="chat-header-info">
+    <div class="chat-header-name" id="peerName">チャット</div>
+    <div class="chat-status" id="peerStatus">GATE MESSAGE</div>
+   </div>
+   <button class="icon-btn" onclick="callNotice('通話機能は今後追加予定です')">☎</button>
+   <button class="icon-btn" onclick="callNotice('ビデオ通話機能は今後追加予定です')">▣</button>
+   <button class="icon-btn" onclick="toggleMenu()">⋯</button>
   </header>
+  <div id="messages">
+   <div class="empty"><strong>GATE MESSAGE</strong>会話を選択してください</div>
+  </div>
+  <div class="composer">
+   <div class="tools">
+    <button class="tool" onclick="document.getElementById('photoFile').click()">📷</button>
+    <button class="tool" onclick="document.getElementById('videoFile').click()">🎥</button>
+    <button class="tool" onclick="toggleStickers()">😊</button>
+    <button class="tool" onclick="callNotice('メッセージを長押しするとリアクションできます')">❤️</button>
+   </div>
+   <div id="stickerPanel">
+    <div class="sticker-grid" id="stickerGrid"></div>
+   </div>
+   <div class="sendline">
+    <input id="messageInput" placeholder="メッセージを入力..."
+     onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}">
+    <button class="send" onclick="sendMessage()">➤</button>
+   </div>
+   <input id="photoFile" type="file" accept="image/*" hidden onchange="uploadMedia(this,'image')">
+   <input id="videoFile" type="file" accept="video/mp4,video/webm" hidden onchange="uploadMedia(this,'video')">
+  </div>
+ </main>
+</div>
 
-  <main class="main" id="mainLayout">
-
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="sidebar-title">メッセージ</div>
-        <input id="userSearch" class="search-box"
-          type="text" placeholder="ユーザー名を検索...">
-        <div id="searchResults" class="search-results"></div>
-      </div>
-
-      <div class="section-heading">CHATS / トーク一覧</div>
-
-      <div id="conversationList" class="conversation-list">
-        <div style="padding:20px;color:#8793a6">
-          トークを読み込み中...
-        </div>
-      </div>
-    </aside>
-
-    <section class="chat">
-
-      <div id="chatEmpty" class="chat-empty">
-        <div class="big-icon">✉</div>
-        <strong>GATE MESSAGE</strong>
-        <p>ユーザーを検索して会話を始めてください。</p>
-      </div>
-
-      <div id="chatContent" class="hidden"
-        style="flex:1;min-height:0;flex-direction:column">
-
-        <div class="chat-header">
-          <button class="back-btn" id="backButton">戻る</button>
-          <div class="avatar" id="chatAvatar">G</div>
-          <div class="chat-header-info">
-            <strong id="chatTitle">トーク</strong>
-            <small>GATE MESSAGE</small>
-          </div>
-        </div>
-
-        <div id="messages" class="messages"></div>
-
-        <div class="input-area">
-          <textarea id="messageInput"
-            placeholder="メッセージを入力..."
-            maxlength="10000" rows="1"></textarea>
-          <button class="send-btn" id="sendButton">➤</button>
-        </div>
-
-      </div>
-
-      <div class="status" id="statusBar">
-        GATE MESSAGE / SECURE CHAT
-      </div>
-    </section>
-
-  </main>
-</section>
+<div id="userPanel" class="hidden">
+ <button class="menu-btn" onclick="hideConversation()">チャットを削除（自分の一覧から）</button>
+ <button class="menu-btn" onclick="toggleBlock()">ブロック・解除</button>
+ <button class="menu-btn" onclick="logout()">ログアウト</button>
+ <button class="menu-btn" onclick="toggleMenu()">閉じる</button>
+</div>
+<div id="notice"></div>
 
 <script>
-"use strict";
+const SUPABASE_URL='https://hxrtpftlklgwesvanlpk.supabase.co';
+const SUPABASE_KEY='sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-/* ======================================
-   SUPABASE
-====================================== */
+let me=null;
+let current=null;
+let peer=null;
+let messagesChannel=null;
+let listChannel=null;
+let conversations=[];
+let blockedUsers=new Set();
+let searchTimer=null;
 
-const SUPABASE_URL =
-  "https://hxrtpftlklgwesvanlpk.supabase.co";
+const $=id=>document.getElementById(id);
 
-const SUPABASE_KEY =
-  "sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ";
-
-let db = null;
-
-let currentUser = null;
-let currentProfile = null;
-let currentConversation = null;
-let currentConversationName = "";
-
-let conversationsCache = [];
-let messageSubscription = null;
-
-let loginRunning = false;
-let signupRunning = false;
-let appReadyUserId = null;
-let searchTimer = null;
-let signingOut = false;
-let initPromise = null;
-
-const $ = id => document.getElementById(id);
-
-
-/* ======================================
-   初期画面
-====================================== */
-
-function showAuthMessage(message, isError = false) {
-  $("authMessage").textContent = message || "";
-  $("authMessage").style.color =
-    isError ? "#e55364" : "#19a879";
+function notice(text){
+ $('notice').textContent=text;
+ $('notice').style.display='block';
+ setTimeout(()=>$('notice').style.display='none',2800);
+}
+function callNotice(text){notice(text)}
+function safe(s){
+ return String(s??'').replace(/[&<>"']/g,c=>({
+ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ }[c]));
+}
+function avatar(name){
+ return safe((name||'G').trim().charAt(0).toUpperCase());
 }
 
-function showLoginScreen(message = "") {
-  $("appScreen").classList.add("hidden");
-  $("authScreen").classList.remove("hidden");
-  showAuthMessage(message);
+async function login(){
+ const email=$('email').value.trim();
+ const password=$('password').value;
+ $('loginError').textContent='';
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+ if(error){
+  $('loginError').textContent=error.message;
+  return;
+ }
+ await startApp(data.user);
 }
 
-function showAppScreen() {
-  $("authScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
+async function startApp(user){
+ me=user;
+ const {data:profile,error}=await db.from('profiles')
+  .select('id,display_name').eq('id',me.id).maybeSingle();
+ if(error){notice('プロフィールを取得できません: '+error.message);return}
+ if(!profile){notice('プロフィールが登録されていません');return}
+ me.name=profile.display_name||'ユーザー';
+ $('myName').textContent=me.name;
+ $('myAvatar').textContent=avatar(me.name);
+ $('login').classList.add('hidden');
+ $('app').classList.remove('hidden');
+ await loadBlocks();
+ await loadConversations();
+ subscribeList();
 }
 
-function setStatus(message) {
-  $("statusBar").textContent = message;
+async function loadBlocks(){
+ const {data,error}=await db.from('gm_blocks')
+  .select('blocked_id').eq('blocker_id',me.id);
+ if(!error)blockedUsers=new Set((data||[]).map(x=>x.blocked_id));
 }
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  })[c]);
+async function loadConversations(){
+ const {data,error}=await db.from('gm_conversation_members')
+  .select('conversation_id,gm_conversations(id,conversation_type,title,created_at,gm_conversation_members(user_id,profiles(id,display_name)),gm_messages(id,content,message_type,created_at,sender_id,deleted_at))')
+  .eq('user_id',me.id);
+ if(error){notice('チャット一覧の取得に失敗: '+error.message);return}
+ conversations=(data||[]).map(row=>{
+  const c=row.gm_conversations;
+  if(!c)return null;
+  const members=c.gm_conversation_members||[];
+  const other=members.find(m=>m.user_id!==me.id);
+  const p=other?.profiles;
+  const last=(c.gm_messages||[]).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
+  return {
+   id:c.id,
+   name:c.conversation_type==='group'?(c.title||'グループ'):(p?.display_name||'ユーザー'),
+   peerId:other?.user_id,
+   last:last?.deleted_at?'メッセージを削除しました':last?.content||'',
+   time:last?.created_at||c.created_at
+  };
+ }).filter(Boolean);
+ const {data:hidden}=await db.from('gm_conversation_hidden')
+  .select('conversation_id').eq('user_id',me.id);
+ const hiddenIds=new Set((hidden||[]).map(x=>x.conversation_id));
+ conversations=conversations.filter(c=>!hiddenIds.has(c.id));
+ renderList();
 }
 
-function initial(value) {
-  return (value || "G").trim().charAt(0).toUpperCase();
+function renderList(filter=''){
+ const list=$('chatList');
+ const filtered=conversations.filter(c=>c.name.toLowerCase().includes(filter.toLowerCase()));
+ list.innerHTML='';
+ if(!filtered.length){
+  list.innerHTML='<div class="empty">チャットがありません<br>＋からユーザーを探しましょう</div>';
+  return;
+ }
+ filtered.sort((a,b)=>new Date(b.time)-new Date(a.time));
+ filtered.forEach(c=>{
+  const el=document.createElement('div');
+  el.className='chat-item';
+  el.innerHTML=`
+   <div class="avatar">${avatar(c.name)}</div>
+   <div class="chat-info">
+    <div class="chat-name">${safe(c.name)}</div>
+    <div class="chat-preview">${safe(c.last||'メッセージを始めましょう')}</div>
+   </div>
+   <div class="time">${new Date(c.time).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})}</div>`;
+  el.onclick=()=>openChat(c);
+  list.appendChild(el);
+ });
 }
 
-function timeText(value) {
-  if (!value) return "";
+function subscribeList(){
+ if(listChannel)db.removeChannel(listChannel);
+ listChannel=db.channel('gm-list-'+me.id)
+ .on('postgres_changes',{
+  event:'*',schema:'public',table:'gm_messages'
+ },()=>loadConversations())
+ .subscribe();
+}
 
-  return new Date(value).toLocaleTimeString("ja-JP", {
-    hour:"2-digit",
-    minute:"2-digit"
+async function newChat(){
+ const name=prompt('相手の表示名を入力してください');
+ if(!name?.trim())return;
+ const {data,error}=await db.from('profiles')
+  .select('id,display_name')
+  .ilike('display_name','%'+name.trim()+'%')
+  .neq('id',me.id).limit(20);
+ if(error){notice(error.message);return}
+ if(!data?.length){notice('ユーザーが見つかりません');return}
+ if(data.length===1){await createChat(data[0]);return}
+ const choice=prompt(data.map((p,i)=>(i+1)+'. '+p.display_name).join('\n')+'\n番号を入力');
+ const p=data[Number(choice)-1];
+ if(p)await createChat(p);
+}
+
+async function searchAll(){
+ clearTimeout(searchTimer);
+ const q=$('search').value.trim();
+ renderList(q);
+ if(q.length<2)return;
+ searchTimer=setTimeout(async()=>{
+  const {data,error}=await db.from('profiles')
+   .select('id,display_name')
+   .ilike('display_name','%'+q+'%')
+   .neq('id',me.id).limit(10);
+  if(error)return;
+  data.forEach(p=>{
+   if(conversations.some(c=>c.peerId===p.id))return;
+   const el=document.createElement('div');
+   el.className='chat-item';
+   el.innerHTML='<div class="avatar">'+avatar(p.display_name)+'</div><div class="chat-info"><div class="chat-name">'+safe(p.display_name)+'</div><div class="chat-preview">ユーザー・新しいチャット</div></div>';
+   el.onclick=()=>createChat(p);
+   $('chatList').prepend(el);
   });
+ },300);
 }
 
-
-/* ======================================
-   SUPABASE起動
-====================================== */
-
-function initializeSupabase() {
-  if (!window.supabase ||
-      typeof window.supabase.createClient !== "function") {
-    throw new Error(
-      "Supabaseライブラリを読み込めません。インターネット接続を確認してください。"
-    );
-  }
-
-  db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-    {
-      auth:{
-        persistSession:true,
-        autoRefreshToken:true,
-        detectSessionInUrl:true
-      }
-    }
-  );
+async function createChat(p){
+ if(blockedUsers.has(p.id)){notice('このユーザーはブロック中です');return}
+ const {data:blocks}=await db.from('gm_blocks')
+  .select('blocker_id').eq('blocker_id',p.id).eq('blocked_id',me.id);
+ if(blocks?.length){notice('このユーザーとはチャットできません');return}
+ const {data,error}=await db.rpc('gm_start_direct_chat',{p_other_user_id:p.id});
+ if(error){notice('チャット作成エラー: '+error.message);return}
+ const id=typeof data==='string'?data:data?.id;
+ if(!id){notice('チャットIDを取得できません');return}
+ await loadConversations();
+ const c=conversations.find(x=>x.id===id)||{
+  id,name:p.display_name,peerId:p.id,last:'',time:new Date().toISOString()
+ };
+ await openChat(c);
 }
 
-
-/* ======================================
-   プロフィール
-====================================== */
-
-async function ensureProfile(user, preferredName = "") {
-  if (!user) {
-    throw new Error("ユーザー情報がありません。");
-  }
-
-  currentUser = user;
-
-  const {data,error} = await db
-    .from("profiles")
-    .select("id,display_name")
-    .eq("id",user.id)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error("プロフィール取得エラー: " + error.message);
-  }
-
-  if (data) {
-    currentProfile = data;
-  } else {
-    const name =
-      preferredName ||
-      user.user_metadata?.display_name ||
-      user.user_metadata?.full_name ||
-      user.email?.split("@")[0] ||
-      "ユーザー";
-
-    const {data:created,error:createError} = await db
-      .from("profiles")
-      .upsert({
-        id:user.id,
-        display_name:name
-      },{onConflict:"id"})
-      .select("id,display_name")
-      .single();
-
-    if (createError) {
-      throw new Error("プロフィール登録エラー: " + createError.message);
-    }
-
-    currentProfile = created;
-  }
-
-  $("headerName").textContent =
-    currentProfile.display_name || "ユーザー";
+async function openChat(c){
+ current=c;
+ peer={id:c.peerId,name:c.name};
+ $('app').classList.add('in-chat');
+ $('peerName').textContent=c.name;
+ $('peerAvatar').textContent=avatar(c.name);
+ $('peerStatus').textContent='GATE MESSAGE';
+ $('messages').innerHTML='';
+ await loadMessages();
+ if(messagesChannel)await db.removeChannel(messagesChannel);
+ messagesChannel=db.channel('gm-room-'+c.id)
+ .on('postgres_changes',{
+  event:'INSERT',schema:'public',table:'gm_messages',
+  filter:'conversation_id=eq.'+c.id
+ },async payload=>{
+  await renderMessage(payload.new);
+  await markRead(payload.new);
+ })
+ .on('postgres_changes',{
+  event:'UPDATE',schema:'public',table:'gm_messages',
+  filter:'conversation_id=eq.'+c.id
+ },()=>loadMessages())
+ .subscribe();
 }
 
-
-/* ======================================
-   アプリ起動
-====================================== */
-
-async function activateApplication(user, preferredName = "") {
-  if (!user) {
-    throw new Error("ログイン情報が取得できません。");
-  }
-
-  if (appReadyUserId === user.id) {
-    showAppScreen();
-    return;
-  }
-
-  currentUser = user;
-
-  await ensureProfile(user,preferredName);
-
-  showAppScreen();
-
-  await loadConversations();
-
-  appReadyUserId = user.id;
-
-  setStatus("GATE MESSAGE / SECURE CHAT");
+function backToList(){
+ $('app').classList.remove('in-chat');
+ if(messagesChannel){db.removeChannel(messagesChannel);messagesChannel=null}
+ current=null;
 }
 
-
-/* ======================================
-   ログイン
-====================================== */
-
-async function login() {
-  if (!db) {
-    showAuthMessage("Supabaseが起動していません。ページを再読み込みしてください。",true);
-    return;
-  }
-
-  if (loginRunning) return;
-
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value;
-
-  if (!email || !password) {
-    showAuthMessage("メールアドレスとパスワードを入力してください。",true);
-    return;
-  }
-
-  loginRunning = true;
-
-  const button = $("loginButton");
-  button.disabled = true;
-  button.textContent = "ログイン中...";
-
-  showAuthMessage("ログインしています...");
-
-  try {
-    const {data,error} = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) throw error;
-
-    if (!data.user || !data.session) {
-      throw new Error("ログインセッションを取得できませんでした。");
-    }
-
-    await activateApplication(data.user);
-
-    $("loginPassword").value = "";
-    showAuthMessage("");
-
-  } catch (error) {
-    console.error("LOGIN ERROR:",error);
-
-    showAuthMessage(
-      "ログインエラー: " + error.message,
-      true
-    );
-
-  } finally {
-    loginRunning = false;
-    button.disabled = false;
-    button.textContent = "ログイン";
-  }
+async function loadMessages(){
+ if(!current)return;
+ const {data,error}=await db.from('gm_messages')
+  .select('*').eq('conversation_id',current.id)
+  .order('created_at',{ascending:true});
+ if(error){notice(error.message);return}
+ $('messages').innerHTML='';
+ for(const m of data||[])await renderMessage(m);
+ $('messages').scrollTop=$('messages').scrollHeight;
+ const incoming=(data||[]).filter(m=>m.sender_id!==me.id&&!m.deleted_at);
+ for(const m of incoming)await markRead(m);
 }
 
-window.login = login;
-
-
-/* ======================================
-   新規登録
-====================================== */
-
-async function signup() {
-  if (!db || signupRunning) return;
-
-  const name = $("signupName").value.trim();
-  const email = $("signupEmail").value.trim();
-  const password = $("signupPassword").value;
-
-  if (!name || !email || !password) {
-    showAuthMessage("すべての項目を入力してください。",true);
-    return;
-  }
-
-  if (password.length < 6) {
-    showAuthMessage("パスワードは6文字以上にしてください。",true);
-    return;
-  }
-
-  signupRunning = true;
-
-  const button = $("signupButton");
-  button.disabled = true;
-  button.textContent = "登録中...";
-
-  try {
-    const {data,error} = await db.auth.signUp({
-      email,
-      password,
-      options:{
-        data:{
-          display_name:name,
-          full_name:name
-        }
-      }
-    });
-
-    if (error) throw error;
-
-    if (data.session && data.user) {
-      await activateApplication(data.user,name);
-      showAuthMessage("");
-    } else {
-      showAuthMessage(
-        "登録が完了しました。確認メールが届いた場合は、メール認証後にログインしてください。"
-      );
-    }
-
-  } catch (error) {
-    console.error("SIGNUP ERROR:",error);
-    showAuthMessage("登録エラー: " + error.message,true);
-
-  } finally {
-    signupRunning = false;
-    button.disabled = false;
-    button.textContent = "アカウントを作成";
-  }
+async function renderMessage(m){
+ if(!m||!current)return;
+ const old=$('msg-'+m.id);
+ if(old)old.remove();
+ const mine=m.sender_id===me.id;
+ const row=document.createElement('div');
+ row.id='msg-'+m.id;
+ row.className='msg-row'+(mine?' mine':'');
+ let body='';
+ if(m.deleted_at){
+  body='<i>このメッセージは削除されました</i>';
+ }else if(m.message_type==='image'){
+  body='<img src="'+safe(m.media_url)+'" alt="写真">';
+ }else if(m.message_type==='video'){
+  body='<video controls playsinline src="'+safe(m.media_url)+'"></video>';
+ }else if(m.message_type==='sticker'){
+  body='<div class="sticker">'+safe(m.content)+'</div>';
+ }else{
+  body=safe(m.content).replace(/\n/g,'<br>');
+ }
+ const {data:reads}=mine?await db.from('gm_message_reads')
+  .select('user_id').eq('message_id',m.id).neq('user_id',me.id):{data:[]};
+ const readText=mine&&reads?.length?'既読':'';
+ row.innerHTML='<div class="bubble">'+body+'</div>'+
+ '<div class="msg-meta">'+new Date(m.created_at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+
+ (m.edited_at?' 編集':'')+' '+readText+'</div>'+
+ '<div style="display:flex;gap:5px;margin-top:4px">'+
+ (mine&&!m.deleted_at?'<button class="tool" onclick="deleteMessage(\''+m.id+'\')">削除</button>':'')+
+ (!m.deleted_at?'<button class="tool" onclick="reactMessage(\''+m.id+'\')">❤️</button>':'')+
+ '</div>';
+ $('messages').appendChild(row);
+ $('messages').scrollTop=$('messages').scrollHeight;
 }
 
-window.signup = signup;
+async function markRead(m){
+ if(!m||m.sender_id===me.id)return;
+ const {error}=await db.from('gm_message_reads').upsert({
+  message_id:m.id,user_id:me.id
+ },{onConflict:'message_id,user_id',ignoreDuplicates:true});
+ if(error)console.error(error);
+}
 
+async function sendMessage(){
+ if(!current)return;
+ const text=$('messageInput').value.trim();
+ if(!text)return;
+ if(peer?.id&&blockedUsers.has(peer.id)){
+  notice('ブロック中のため送信できません');return;
+ }
+ const {data:blocks}=peer?.id?await db.from('gm_blocks')
+  .select('blocker_id').eq('blocker_id',peer.id).eq('blocked_id',me.id):{data:[]};
+ if(blocks?.length){notice('相手からブロックされています');return}
+ const {error}=await db.from('gm_messages').insert({
+  conversation_id:current.id,sender_id:me.id,
+  content:text,message_type:'text'
+ });
+ if(error){notice('送信できません: '+error.message);return}
+ $('messageInput').value='';
+}
 
-/* ======================================
-   画面切り替え
-====================================== */
+async function uploadMedia(input,type){
+ const file=input.files?.[0];
+ if(!file||!current)return;
+ const max=50*1024*1024;
+ if(file.size>max){notice('ファイルは50MB以下にしてください');input.value='';return}
+ const ext=file.name.split('.').pop().toLowerCase();
+ const path=me.id+'/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
+ notice('アップロード中...');
+ const {error:uploadError}=await db.storage.from('gm-media').upload(path,file,{
+  cacheControl:'3600',upsert:false,contentType:file.type
+ });
+ if(uploadError){notice('アップロード失敗: '+uploadError.message);input.value='';return}
+ const {data}=db.storage.from('gm-media').getPublicUrl(path);
+ const {error}=await db.from('gm_messages').insert({
+  conversation_id:current.id,sender_id:me.id,
+  content:type==='image'?'写真を送信しました':'動画を送信しました',
+  message_type:type,media_url:data.publicUrl,media_name:file.name
+ });
+ if(error)notice('送信失敗: '+error.message);
+ else notice('送信しました');
+ input.value='';
+}
 
-$("showSignup").addEventListener("click",() => {
-  $("loginForm").classList.add("hidden");
-  $("signupForm").classList.remove("hidden");
-  showAuthMessage("");
-});
+const stickers=['😀','😂','🥰','😍','😭','😎','👍','❤️','🎉','🙏','🐱','🐶','🌸','🔥','✨','💯'];
+function buildStickers(){
+ $('stickerGrid').innerHTML='';
+ stickers.forEach(s=>{
+  const b=document.createElement('button');
+  b.textContent=s;
+  b.onclick=()=>sendSticker(s);
+  $('stickerGrid').appendChild(b);
+ });
+}
+function toggleStickers(){
+ const p=$('stickerPanel');
+ p.style.display=p.style.display==='block'?'none':'block';
+}
+async function sendSticker(s){
+ if(!current)return;
+ const {error}=await db.from('gm_messages').insert({
+  conversation_id:current.id,sender_id:me.id,
+  content:s,message_type:'sticker'
+ });
+ if(error)notice(error.message);
+ $('stickerPanel').style.display='none';
+}
 
-$("showLogin").addEventListener("click",() => {
-  $("signupForm").classList.add("hidden");
-  $("loginForm").classList.remove("hidden");
-  showAuthMessage("");
-});
+async function deleteMessage(id){
+ if(!confirm('このメッセージを削除しますか？'))return;
+ const {error}=await db.from('gm_messages')
+  .update({deleted_at:new Date().toISOString()})
+  .eq('id',id).eq('sender_id',me.id);
+ if(error){notice('削除できません: '+error.message);return}
+ notice('削除しました');
+ await loadMessages();
+}
 
-$("loginPassword").addEventListener("keydown",event => {
-  if (event.key === "Enter") login();
-});
+async function reactMessage(id){
+ const reaction=prompt('リアクションを入力してください（❤️ 👍 😂 😮 😢）','❤️');
+ if(!reaction)return;
+ const {error}=await db.from('gm_message_reactions').insert({
+  message_id:id,user_id:me.id,reaction:reaction
+ });
+ if(error)notice('リアクションできません: '+error.message);
+ else notice('リアクションしました');
+}
 
-$("loginEmail").addEventListener("keydown",event => {
-  if (event.key === "Enter") $("loginPassword").focus();
-});
+async function hideConversation(){
+ if(!current)return;
+ if(!confirm('自分のチャット一覧から削除しますか？相手の画面からは削除されません。'))return;
+ const {error}=await db.from('gm_conversation_hidden').upsert({
+  conversation_id:current.id,user_id:me.id
+ });
+ if(error){notice(error.message);return}
+ $('userPanel').classList.add('hidden');
+ backToList();
+ await loadConversations();
+ notice('チャットを非表示にしました');
+}
 
-
-/* ======================================
-   ユーザー検索
-====================================== */
-
-$("userSearch").addEventListener("input",() => {
-  clearTimeout(searchTimer);
-
-  const keyword = $("userSearch").value.trim();
-
-  searchTimer = setTimeout(() => {
-    searchUsers(keyword);
-  },350);
-});
-
-async function searchUsers(keyword) {
-  const results = $("searchResults");
-
-  if (!keyword) {
-    results.innerHTML = "";
-    return;
-  }
-
-  if (!currentUser) return;
-
-  results.textContent = "検索中...";
-
-  const {data,error} = await db
-    .from("profiles")
-    .select("id,display_name")
-    .neq("id",currentUser.id)
-    .ilike("display_name","%" + keyword + "%")
-    .order("display_name")
-    .limit(20);
-
-  if (error) {
-    results.textContent = "検索エラー: " + error.message;
-    return;
-  }
-
-  if (!data.length) {
-    results.textContent = "ユーザーが見つかりません。";
-    return;
-  }
-
-  results.innerHTML = data.map(user => `
-    <div class="user-result"
-      data-id="${escapeHTML(user.id)}"
-      data-name="${escapeHTML(user.display_name)}">
-
-      <div class="avatar">${escapeHTML(initial(user.display_name))}</div>
-
-      <div class="user-result-info">
-        <strong>${escapeHTML(user.display_name)}</strong>
-        <small>GATE MESSAGE USER</small>
-      </div>
-      <span>＋</span>
-    </div>
-  `).join("");
-
-  results.querySelectorAll(".user-result").forEach(item => {
-    item.addEventListener("click",() => {
-      startDirectChat(item.dataset.id,item.dataset.name);
-    });
+async function toggleBlock(){
+ if(!peer?.id)return;
+ const isBlocked=blockedUsers.has(peer.id);
+ if(!confirm(isBlocked?'ブロックを解除しますか？':'このユーザーをブロックしますか？'))return;
+ if(isBlocked){
+  const {error}=await db.from('gm_blocks')
+   .delete().eq('blocker_id',me.id).eq('blocked_id',peer.id);
+  if(error){notice(error.message);return}
+  blockedUsers.delete(peer.id);
+  notice('ブロックを解除しました');
+ }else{
+  const {error}=await db.from('gm_blocks').insert({
+   blocker_id:me.id,blocked_id:peer.id
   });
+  if(error){notice(error.message);return}
+  blockedUsers.add(peer.id);
+  notice('ブロックしました');
+ }
+ $('userPanel').classList.add('hidden');
 }
 
-
-/* ======================================
-   1対1トーク
-====================================== */
-
-async function startDirectChat(otherId,otherName) {
-  try {
-    setStatus("トークを準備しています...");
-
-    const {data,error} = await db.rpc("gm_start_direct_chat",{
-      p_other_user_id:otherId
-    });
-
-    if (error) throw error;
-
-    if (!data) throw new Error("トークIDを取得できません。");
-
-    $("userSearch").value = "";
-    $("searchResults").innerHTML = "";
-
-    await loadConversations();
-    await openConversation(data,otherName);
-
-    setStatus("GATE MESSAGE / SECURE CHAT");
-
-  } catch (error) {
-    console.error(error);
-    alert("トーク開始エラー: " + error.message);
-  }
+function toggleMenu(){
+ $('userPanel').classList.toggle('hidden');
+}
+async function logout(){
+ if(messagesChannel)await db.removeChannel(messagesChannel);
+ if(listChannel)await db.removeChannel(listChannel);
+ await db.auth.signOut();
+ location.reload();
 }
 
+buildStickers();
 
-/* ======================================
-   トーク一覧
-====================================== */
-
-async function loadConversations() {
-  if (!currentUser) return;
-
-  const list = $("conversationList");
-
-  const {data:memberships,error} = await db
-    .from("gm_conversation_members")
-    .select("conversation_id")
-    .eq("user_id",currentUser.id);
-
-  if (error) {
-    list.textContent = "トーク一覧エラー: " + error.message;
-    return;
-  }
-
-  if (!memberships?.length) {
-    conversationsCache = [];
-    list.textContent = "まだトークはありません。";
-    return;
-  }
-
-  const ids = memberships.map(x => x.conversation_id);
-
-  const {data:conversations,error:conversationError} = await db
-    .from("gm_conversations")
-    .select("id,conversation_type,title,created_at")
-    .in("id",ids)
-    .order("created_at",{ascending:false});
-
-  if (conversationError) throw conversationError;
-
-  const {data:members,error:memberError} = await db
-    .from("gm_conversation_members")
-    .select("conversation_id,user_id")
-    .in("conversation_id",ids);
-
-  if (memberError) throw memberError;
-
-  const otherIds = [...new Set(
-    (members || [])
-      .filter(m => m.user_id !== currentUser.id)
-      .map(m => m.user_id)
-  )];
-
-  let profiles = [];
-
-  if (otherIds.length) {
-    const {data,error:profileError} = await db
-      .from("profiles")
-      .select("id,display_name")
-      .in("id",otherIds);
-
-    if (profileError) throw profileError;
-
-    profiles = data || [];
-  }
-
-  const {data:latestMessages,error:messageError} = await db
-    .from("gm_messages")
-    .select("conversation_id,content,created_at")
-    .in("conversation_id",ids)
-    .order("created_at",{ascending:false})
-    .limit(200);
-
-  if (messageError) throw messageError;
-
-  conversationsCache = (conversations || []).map(c => {
-    const other = (members || []).find(
-      m => m.conversation_id === c.id &&
-      m.user_id !== currentUser.id
-    );
-
-    const profile = profiles.find(p => p.id === other?.user_id);
-
-    const latest = (latestMessages || []).find(
-      m => m.conversation_id === c.id
-    );
-
-    return {
-      ...c,
-      name:c.conversation_type === "group"
-        ? c.title || "グループ"
-        : profile?.display_name || "ユーザー",
-      lastMessage:latest?.content || "メッセージはありません",
-      lastTime:latest?.created_at || c.created_at
-    };
-  });
-
-  renderConversationList();
-}
-
-
-/* ======================================
-   トーク一覧描画
-====================================== */
-
-function renderConversationList() {
-  const list = $("conversationList");
-
-  if (!conversationsCache.length) {
-    list.textContent = "トークはありません。";
-    return;
-  }
-
-  list.innerHTML = conversationsCache.map(c => `
-    <div class="conversation-item ${currentConversation === c.id ? "active" : ""}"
-      data-id="${escapeHTML(c.id)}"
-      data-name="${escapeHTML(c.name)}">
-
-      <div class="avatar">${escapeHTML(initial(c.name))}</div>
-
-      <div class="conversation-info">
-        <strong>${escapeHTML(c.name)}</strong>
-        <small>${escapeHTML(c.lastMessage)}</small>
-      </div>
-
-      <small>${escapeHTML(timeText(c.lastTime))}</small>
-    </div>
-  `).join("");
-
-  list.querySelectorAll(".conversation-item").forEach(item => {
-    item.addEventListener("click",() => {
-      openConversation(item.dataset.id,item.dataset.name);
-    });
-  });
-}
-
-
-/* ======================================
-   トーク画面
-====================================== */
-
-async function openConversation(id,name) {
-  currentConversation = id;
-  currentConversationName = name;
-
-  $("chatEmpty").classList.add("hidden");
-  $("chatContent").classList.remove("hidden");
-  $("chatContent").style.display = "flex";
-
-  $("chatTitle").textContent = name;
-  $("chatAvatar").textContent = initial(name);
-
-  $("mainLayout").classList.add("chat-open");
-
-  renderConversationList();
-
-  await loadMessages();
-  subscribeMessages(id);
-}
-
-
-/* ======================================
-   メッセージ取得
-====================================== */
-
-async function loadMessages() {
-  if (!currentConversation) return;
-
-  const id = currentConversation;
-  const box = $("messages");
-
-  const {data,error} = await db
-    .from("gm_messages")
-    .select("id,conversation_id,sender_id,content,created_at")
-    .eq("conversation_id",id)
-    .order("created_at",{ascending:true})
-    .limit(500);
-
-  if (error) {
-    box.textContent = "メッセージ取得エラー: " + error.message;
-    return;
-  }
-
-  if (currentConversation !== id) return;
-
-  renderMessages(data || []);
-}
-
-
-/* ======================================
-   メッセージ描画
-====================================== */
-
-function renderMessages(messages) {
-  const box = $("messages");
-
-  if (!messages.length) {
-    box.innerHTML =
-      '<div style="margin:auto;color:#8793a6">会話を始めましょう！</div>';
-    return;
-  }
-
-  box.innerHTML = messages.map(m => {
-    const mine = m.sender_id === currentUser.id;
-
-    return `
-      <div class="message-row ${mine ? "mine" : ""}">
-        ${mine ? "" : `
-          <div class="message-sender">
-            ${escapeHTML(currentConversationName)}
-          </div>
-        `}
-
-        <div class="bubble">${escapeHTML(m.content)}</div>
-
-        <div class="message-time">
-          ${escapeHTML(timeText(m.created_at))}
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  box.scrollTop = box.scrollHeight;
-}
-
-
-/* ======================================
-   メッセージ送信
-====================================== */
-
-async function sendMessage() {
-  if (!currentUser || !currentConversation) return;
-
-  const input = $("messageInput");
-  const button = $("sendButton");
-  const content = input.value.trim();
-
-  if (!content) return;
-
-  const id = currentConversation;
-
-  button.disabled = true;
-
-  try {
-    const {error} = await db
-      .from("gm_messages")
-      .insert({
-        conversation_id:id,
-        sender_id:currentUser.id,
-        content
-      });
-
-    if (error) throw error;
-
-    input.value = "";
-
-    if (currentConversation === id) {
-      await loadMessages();
-    }
-
-    await loadConversations();
-
-  } catch (error) {
-    alert("送信エラー: " + error.message);
-  } finally {
-    button.disabled = false;
-    input.focus();
-  }
-}
-
-$("sendButton").addEventListener("click",sendMessage);
-
-$("messageInput").addEventListener("keydown",event => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
-  }
+db.auth.getSession().then(({data})=>{
+ if(data.session)startApp(data.session.user);
 });
-
-
-/* ======================================
-   リアルタイム
-====================================== */
-
-function unsubscribeMessages() {
-  if (messageSubscription && db) {
-    db.removeChannel(messageSubscription);
-  }
-
-  messageSubscription = null;
-}
-
-function subscribeMessages(id) {
-  unsubscribeMessages();
-
-  messageSubscription = db
-    .channel("gm-chat-" + id)
-    .on(
-      "postgres_changes",
-      {
-        event:"INSERT",
-        schema:"public",
-        table:"gm_messages",
-        filter:"conversation_id=eq." + id
-      },
-      async payload => {
-        if (currentConversation !== id) return;
-
-        if (payload.new.sender_id === currentUser.id) return;
-
-        await loadMessages();
-        await loadConversations();
-      }
-    )
-    .subscribe();
-}
-
-
-/* ======================================
-   戻る
-====================================== */
-
-$("backButton").addEventListener("click",() => {
-  $("mainLayout").classList.remove("chat-open");
-
-  unsubscribeMessages();
-
-  currentConversation = null;
-  currentConversationName = "";
-
-  $("chatContent").classList.add("hidden");
-  $("chatContent").style.display = "none";
-
-  $("chatEmpty").classList.remove("hidden");
-
-  renderConversationList();
+db.auth.onAuthStateChange((event,session)=>{
+ if(event==='SIGNED_OUT'){
+  me=null;
+  $('app').classList.add('hidden');
+  $('login').classList.remove('hidden');
+ }
 });
-
-
-/* ======================================
-   ログアウト
-====================================== */
-
-$("logoutButton").addEventListener("click",async () => {
-  if (!confirm("ログアウトしますか？")) return;
-
-  signingOut = true;
-  unsubscribeMessages();
-
-  try {
-    const {error} = await db.auth.signOut();
-
-    if (error) throw error;
-
-    currentUser = null;
-    currentProfile = null;
-    currentConversation = null;
-    currentConversationName = "";
-    appReadyUserId = null;
-    conversationsCache = [];
-
-    showLoginScreen("ログアウトしました。");
-
-  } catch (error) {
-    alert("ログアウトエラー: " + error.message);
-  } finally {
-    signingOut = false;
-  }
-});
-
-
-/* ======================================
-   認証状態監視
-====================================== */
-
-async function initializePage() {
-  try {
-    initializeSupabase();
-
-    const {data,error} = await db.auth.getSession();
-
-    if (error) throw error;
-
-    if (data.session?.user) {
-      await activateApplication(data.session.user);
-    } else {
-      showLoginScreen("");
-    }
-
-    db.auth.onAuthStateChange((event,session) => {
-      if (event === "INITIAL_SESSION") return;
-
-      setTimeout(async () => {
-        if (session?.user) {
-          if (appReadyUserId !== session.user.id) {
-            try {
-              await activateApplication(session.user);
-            } catch (error) {
-              console.error(error);
-              showLoginScreen(
-                "初期化エラー: " + error.message
-              );
-            }
-          }
-        } else if (!signingOut) {
-          currentUser = null;
-          currentProfile = null;
-          currentConversation = null;
-          currentConversationName = "";
-          appReadyUserId = null;
-
-          unsubscribeMessages();
-
-          showLoginScreen("");
-        }
-      },0);
-    });
-
-  } catch (error) {
-    console.error("INITIALIZATION ERROR:",error);
-
-    showLoginScreen(
-      "起動エラー: " + error.message
-    );
-  }
-}
-
-
-/* ======================================
-   エラー表示
-====================================== */
-
-window.addEventListener("error",event => {
-  console.error("JAVASCRIPT ERROR:",event.error || event.message);
-
-  if (!$("appScreen").classList.contains("hidden")) {
-    setStatus("JavaScriptエラーが発生しました。");
-  } else {
-    showAuthMessage(
-      "ページの処理でエラーが発生しました: " + event.message,
-      true
-    );
-  }
-});
-
-window.addEventListener("unhandledrejection",event => {
-  console.error("PROMISE ERROR:",event.reason);
-
-  const message = event.reason?.message || String(event.reason);
-
-  if ($("authScreen") && !$("authScreen").classList.contains("hidden")) {
-    showAuthMessage("処理エラー: " + message,true);
-  }
-});
-
-
-/* ======================================
-   起動
-====================================== */
-
-initializePage();
-
-</script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101d35">
-<title>GATE MESSAGE | GATE SQUARE</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-:root {
-  --navy:#101d35;
-  --navy2:#192e50;
-  --cyan:#35d9f5;
-  --blue:#2385ff;
-  --bg:#f1f5fa;
-  --text:#19263c;
-  --muted:#8290a5;
-  --border:#e4eaf2;
-  --red:#e55364;
-}
-
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  font-family:Arial,"Noto Sans JP",sans-serif;
-  color:var(--text);
-  background:var(--bg);
-}
-
-button,input,textarea {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-button:disabled {
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-.hidden {
-  display:none !important;
-}
-
-/* ログイン画面 */
-
-.auth-screen {
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:
-    radial-gradient(circle at 20% 20%,#164b72,transparent 40%),
-    linear-gradient(135deg,#0c172b,#172c4b);
-}
-
-.auth-card {
-  width:100%;
-  max-width:430px;
-  padding:35px;
-  background:white;
-  border-radius:22px;
-  box-shadow:0 25px 70px #0005;
-}
-
-.logo {
-  text-align:center;
-  margin-bottom:28px;
-}
-
-.logo-icon {
-  width:65px;
-  height:65px;
-  margin:auto;
-  display:grid;
-  place-items:center;
-  background:var(--navy);
-  color:var(--cyan);
-  border-radius:20px;
-  font-size:30px;
-}
-
-.logo h1 {
-  margin:14px 0 5px;
-  letter-spacing:2px;
-  font-size:25px;
-}
-
-.logo p {
-  color:var(--muted);
-  font-size:11px;
-  letter-spacing:2px;
-}
-
-.auth-card label {
-  display:block;
-  font-size:13px;
-  font-weight:bold;
-  margin:16px 0 7px;
-}
-
-.auth-card input {
-  width:100%;
-  padding:14px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  outline:none;
-}
-
-.auth-card input:focus {
-  border-color:var(--cyan);
-}
-
-.primary-btn {
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  color:white;
-  font-weight:bold;
-  background:linear-gradient(100deg,#1479e9,#19bfdc);
-  margin-top:20px;
-}
-
-.auth-switch {
-  margin-top:20px;
-  text-align:center;
-  font-size:13px;
-  color:#2586dd;
-  cursor:pointer;
-}
-
-.message {
-  font-size:13px;
-  margin-top:13px;
-  line-height:1.7;
-  overflow-wrap:anywhere;
-}
-
-/* アプリ */
-
-.app {
-  height:100dvh;
-  display:flex;
-  flex-direction:column;
-  max-width:1500px;
-  margin:auto;
-  background:white;
-}
-
-.header {
-  min-height:65px;
-  background:var(--navy);
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 22px;
-  border-bottom:2px solid var(--cyan);
-}
-
-.header-brand {
-  font-size:19px;
-  font-weight:bold;
-  letter-spacing:1px;
-}
-
-.header-brand span {
-  color:var(--cyan);
-}
-
-.header-user {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:13px;
-}
-
-.header-user button {
-  border:1px solid #ffffff55;
-  background:transparent;
-  color:white;
-  padding:8px 12px;
-  border-radius:8px;
-}
-
-.main {
-  display:grid;
-  grid-template-columns:340px 1fr;
-  flex:1;
-  min-height:0;
-}
-
-.sidebar {
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
-
-.sidebar-top {
-  padding:20px;
-  border-bottom:1px solid var(--border);
-}
-
-.sidebar-title {
-  font-size:20px;
-  font-weight:bold;
-  margin-bottom:15px;
-}
-
-.search-box {
-  width:100%;
-  border:1px solid var(--border);
-  background:#f5f8fc;
-  padding:12px;
-  border-radius:10px;
-  outline:none;
-}
-
-.search-results {
-  margin-top:10px;
-  max-height:180px;
-  overflow:auto;
-}
-
-.user-result {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.user-result:hover {
-  background:#eef7fc;
-}
-
-.avatar {
-  width:42px;
-  height:42px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  color:white;
-  font-weight:bold;
-  background:linear-gradient(135deg,#176fbd,#31c8df);
-}
-
-.user-result-info {
-  min-width:0;
-  flex:1;
-}
-
-.user-result-info strong {
-  display:block;
-  font-size:14px;
-}
-
-.user-result-info small {
-  color:var(--muted);
-  font-size:11px;
-}
-
-.section-heading {
-  padding:17px 20px 8px;
-  font-size:12px;
-  font-weight:bold;
-  color:var(--muted);
-  letter-spacing:1px;
-}
-
-.conversation-list {
-  overflow:auto;
-  flex:1;
-}
-
-.conversation-item {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:14px 18px;
-  cursor:pointer;
-  border-bottom:1px solid #f0f3f7;
-}
-
-.conversation-item:hover {
-  background:#f4f8fc;
-}
-
-.conversation-item.active {
-  background:#eaf7fc;
-  border-left:4px solid var(--cyan);
-  padding-left:14px;
-}
-
-.conversation-info {
-  flex:1;
-  min-width:0;
-}
-
-.conversation-info strong {
-  display:block;
-  font-size:14px;
-  margin-bottom:5px;
-}
-
-.conversation-info small {
-  color:var(--muted);
-  font-size:12px;
-  display:block;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-}
-
-.chat {
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-  min-height:0;
-}
-
-.chat-empty {
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  color:var(--muted);
-  text-align:center;
-  padding:25px;
-}
-
-.big-icon {
-  font-size:60px;
-  color:#b6d8e9;
-  margin-bottom:15px;
-}
-
-.chat-header {
-  padding:16px 22px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border-bottom:1px solid var(--border);
-  min-height:75px;
-}
-
-.chat-header-info {
-  flex:1;
-}
-
-.chat-header-info strong {
-  display:block;
-  font-size:16px;
-}
-
-.chat-header-info small {
-  color:var(--muted);
-  font-size:12px;
-}
-
-.messages {
-  flex:1;
-  overflow-y:auto;
-  padding:24px;
-  background:#f7f9fc;
-  display:flex;
-  flex-direction:column;
-  gap:13px;
-}
-
-.message-row {
-  display:flex;
-  flex-direction:column;
-  max-width:75%;
-  align-self:flex-start;
-}
-
-.message-row.mine {
-  align-self:flex-end;
-  align-items:flex-end;
-}
-
-.message-sender {
-  font-size:11px;
-  color:var(--muted);
-  margin:0 5px 5px;
-}
-
-.bubble {
-  padding:12px 15px;
-  border-radius:16px;
-  background:white;
-  box-shadow:0 2px 7px #10243b0c;
-  font-size:14px;
-  line-height:1.65;
-  overflow-wrap:anywhere;
-  white-space:pre-wrap;
-}
-
-.mine .bubble {
-  background:#d9f7ff;
-  border-bottom-right-radius:4px;
-}
-
-.message-time {
-  color:#a1aabb;
-  font-size:10px;
-  margin:4px 5px 0;
-}
-
-.input-area {
-  padding:15px 20px;
-  border-top:1px solid var(--border);
-  display:flex;
-  align-items:flex-end;
-  gap:10px;
-}
-
-.input-area textarea {
-  flex:1;
-  min-height:45px;
-  max-height:120px;
-  resize:none;
-  padding:13px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  outline:none;
-  font-size:14px;
-}
-
-.send-btn {
-  width:48px;
-  height:45px;
-  border:0;
-  border-radius:12px;
-  color:white;
-  background:linear-gradient(135deg,#1684eb,#20c6df);
-  font-size:20px;
-}
-
-.status {
-  padding:7px 12px;
-  font-size:11px;
-  color:var(--muted);
-  background:#f7f9fc;
-  border-top:1px solid var(--border);
-}
-
-.back-btn {
-  display:none;
-  border:0;
-  background:#edf4fa;
-  padding:9px 12px;
-  border-radius:8px;
-}
-
-@media(max-width:700px) {
-  .header {
-    padding:0 12px;
-    min-height:58px;
-  }
-
-  .header-brand {
-    font-size:15px;
-  }
-
-  .header-user {
-    gap:6px;
-    font-size:11px;
-  }
-
-  .header-user button {
-    padding:7px;
-    font-size:11px;
-  }
-
-  .main {
-    grid-template-columns:1fr;
-  }
-
-  .chat {
-    display:none;
-  }
-
-  .main.chat-open .sidebar {
-    display:none;
-  }
-
-  .main.chat-open .chat {
-    display:flex;
-  }
-
-  .back-btn {
-    display:block;
-  }
-
-  .messages {
-    padding:16px 12px;
-  }
-
-  .message-row {
-    max-width:85%;
-  }
-
-  .input-area {
-    padding:10px;
-  }
-
-  .auth-card {
-    padding:25px;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<section id="authScreen" class="auth-screen">
-  <div class="auth-card">
-
-    <div class="logo">
-      <div class="logo-icon">✉</div>
-      <h1>GATE MESSAGE</h1>
-      <p>GATE SQUARE COMMUNICATION</p>
-    </div>
-
-    <div id="loginForm">
-      <label>メールアドレス</label>
-      <input id="loginEmail" type="email"
-        placeholder="メールアドレス" autocomplete="username">
-
-      <label>パスワード</label>
-      <input id="loginPassword" type="password"
-        placeholder="パスワード" autocomplete="current-password">
-
-      <button class="primary-btn" id="loginButton"
-        type="button" onclick="login()">
-        ログイン
-      </button>
-
-      <div class="auth-switch" id="showSignup">
-        アカウントを新規登録する
-      </div>
-    </div>
-
-    <div id="signupForm" class="hidden">
-      <label>表示名</label>
-      <input id="signupName" type="text" maxlength="40"
-        placeholder="あなたの名前">
-
-      <label>メールアドレス</label>
-      <input id="signupEmail" type="email"
-        placeholder="メールアドレス">
-
-      <label>パスワード（6文字以上）</label>
-      <input id="signupPassword" type="password"
-        placeholder="パスワード">
-
-      <button class="primary-btn" id="signupButton"
-        type="button" onclick="signup()">
-        アカウントを作成
-      </button>
-
-      <div class="auth-switch" id="showLogin">
-        ログイン画面に戻る
-      </div>
-    </div>
-
-    <div id="authMessage" class="message"></div>
-  </div>
-</section>
-
-<section id="appScreen" class="app hidden">
-
-  <header class="header">
-    <div class="header-brand">✉ <span>GATE</span> MESSAGE</div>
-    <div class="header-user">
-      <span id="headerName">ユーザー</span>
-      <button id="logoutButton" type="button">ログアウト</button>
-    </div>
-  </header>
-
-  <main class="main" id="mainLayout">
-
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="sidebar-title">メッセージ</div>
-        <input id="userSearch" class="search-box"
-          type="text" placeholder="ユーザー名を検索...">
-        <div id="searchResults" class="search-results"></div>
-      </div>
-
-      <div class="section-heading">CHATS / トーク一覧</div>
-
-      <div id="conversationList" class="conversation-list">
-        <div style="padding:20px;color:#8793a6">
-          トークを読み込み中...
-        </div>
-      </div>
-    </aside>
-
-    <section class="chat">
-
-      <div id="chatEmpty" class="chat-empty">
-        <div class="big-icon">✉</div>
-        <strong>GATE MESSAGE</strong>
-        <p>ユーザーを検索して会話を始めてください。</p>
-      </div>
-
-      <div id="chatContent" class="hidden"
-        style="flex:1;min-height:0;flex-direction:column">
-
-        <div class="chat-header">
-          <button class="back-btn" id="backButton">戻る</button>
-          <div class="avatar" id="chatAvatar">G</div>
-          <div class="chat-header-info">
-            <strong id="chatTitle">トーク</strong>
-            <small>GATE MESSAGE</small>
-          </div>
-        </div>
-
-        <div id="messages" class="messages"></div>
-
-        <div class="input-area">
-          <textarea id="messageInput"
-            placeholder="メッセージを入力..."
-            maxlength="10000" rows="1"></textarea>
-          <button class="send-btn" id="sendButton">➤</button>
-        </div>
-
-      </div>
-
-      <div class="status" id="statusBar">
-        GATE MESSAGE / SECURE CHAT
-      </div>
-    </section>
-
-  </main>
-</section>
-
-<script>
-"use strict";
-
-/* ======================================
-   SUPABASE
-====================================== */
-
-const SUPABASE_URL =
-  "https://hxrtpftlklgwesvanlpk.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ";
-
-let db = null;
-
-let currentUser = null;
-let currentProfile = null;
-let currentConversation = null;
-let currentConversationName = "";
-
-let conversationsCache = [];
-let messageSubscription = null;
-
-let loginRunning = false;
-let signupRunning = false;
-let appReadyUserId = null;
-let searchTimer = null;
-let signingOut = false;
-let initPromise = null;
-
-const $ = id => document.getElementById(id);
-
-
-/* ======================================
-   初期画面
-====================================== */
-
-function showAuthMessage(message, isError = false) {
-  $("authMessage").textContent = message || "";
-  $("authMessage").style.color =
-    isError ? "#e55364" : "#19a879";
-}
-
-function showLoginScreen(message = "") {
-  $("appScreen").classList.add("hidden");
-  $("authScreen").classList.remove("hidden");
-  showAuthMessage(message);
-}
-
-function showAppScreen() {
-  $("authScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-}
-
-function setStatus(message) {
-  $("statusBar").textContent = message;
-}
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  })[c]);
-}
-
-function initial(value) {
-  return (value || "G").trim().charAt(0).toUpperCase();
-}
-
-function timeText(value) {
-  if (!value) return "";
-
-  return new Date(value).toLocaleTimeString("ja-JP", {
-    hour:"2-digit",
-    minute:"2-digit"
-  });
-}
-
-
-/* ======================================
-   SUPABASE起動
-====================================== */
-
-function initializeSupabase() {
-  if (!window.supabase ||
-      typeof window.supabase.createClient !== "function") {
-    throw new Error(
-      "Supabaseライブラリを読み込めません。インターネット接続を確認してください。"
-    );
-  }
-
-  db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-    {
-      auth:{
-        persistSession:true,
-        autoRefreshToken:true,
-        detectSessionInUrl:true
-      }
-    }
-  );
-}
-
-
-/* ======================================
-   プロフィール
-====================================== */
-
-async function ensureProfile(user, preferredName = "") {
-  if (!user) {
-    throw new Error("ユーザー情報がありません。");
-  }
-
-  currentUser = user;
-
-  const {data,error} = await db
-    .from("profiles")
-    .select("id,display_name")
-    .eq("id",user.id)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error("プロフィール取得エラー: " + error.message);
-  }
-
-  if (data) {
-    currentProfile = data;
-  } else {
-    const name =
-      preferredName ||
-      user.user_metadata?.display_name ||
-      user.user_metadata?.full_name ||
-      user.email?.split("@")[0] ||
-      "ユーザー";
-
-    const {data:created,error:createError} = await db
-      .from("profiles")
-      .upsert({
-        id:user.id,
-        display_name:name
-      },{onConflict:"id"})
-      .select("id,display_name")
-      .single();
-
-    if (createError) {
-      throw new Error("プロフィール登録エラー: " + createError.message);
-    }
-
-    currentProfile = created;
-  }
-
-  $("headerName").textContent =
-    currentProfile.display_name || "ユーザー";
-}
-
-
-/* ======================================
-   アプリ起動
-====================================== */
-
-async function activateApplication(user, preferredName = "") {
-  if (!user) {
-    throw new Error("ログイン情報が取得できません。");
-  }
-
-  if (appReadyUserId === user.id) {
-    showAppScreen();
-    return;
-  }
-
-  currentUser = user;
-
-  await ensureProfile(user,preferredName);
-
-  showAppScreen();
-
-  await loadConversations();
-
-  appReadyUserId = user.id;
-
-  setStatus("GATE MESSAGE / SECURE CHAT");
-}
-
-
-/* ======================================
-   ログイン
-====================================== */
-
-async function login() {
-  if (!db) {
-    showAuthMessage("Supabaseが起動していません。ページを再読み込みしてください。",true);
-    return;
-  }
-
-  if (loginRunning) return;
-
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value;
-
-  if (!email || !password) {
-    showAuthMessage("メールアドレスとパスワードを入力してください。",true);
-    return;
-  }
-
-  loginRunning = true;
-
-  const button = $("loginButton");
-  button.disabled = true;
-  button.textContent = "ログイン中...";
-
-  showAuthMessage("ログインしています...");
-
-  try {
-    const {data,error} = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) throw error;
-
-    if (!data.user || !data.session) {
-      throw new Error("ログインセッションを取得できませんでした。");
-    }
-
-    await activateApplication(data.user);
-
-    $("loginPassword").value = "";
-    showAuthMessage("");
-
-  } catch (error) {
-    console.error("LOGIN ERROR:",error);
-
-    showAuthMessage(
-      "ログインエラー: " + error.message,
-      true
-    );
-
-  } finally {
-    loginRunning = false;
-    button.disabled = false;
-    button.textContent = "ログイン";
-  }
-}
-
-window.login = login;
-
-
-/* ======================================
-   新規登録
-====================================== */
-
-async function signup() {
-  if (!db || signupRunning) return;
-
-  const name = $("signupName").value.trim();
-  const email = $("signupEmail").value.trim();
-  const password = $("signupPassword").value;
-
-  if (!name || !email || !password) {
-    showAuthMessage("すべての項目を入力してください。",true);
-    return;
-  }
-
-  if (password.length < 6) {
-    showAuthMessage("パスワードは6文字以上にしてください。",true);
-    return;
-  }
-
-  signupRunning = true;
-
-  const button = $("signupButton");
-  button.disabled = true;
-  button.textContent = "登録中...";
-
-  try {
-    const {data,error} = await db.auth.signUp({
-      email,
-      password,
-      options:{
-        data:{
-          display_name:name,
-          full_name:name
-        }
-      }
-    });
-
-    if (error) throw error;
-
-    if (data.session && data.user) {
-      await activateApplication(data.user,name);
-      showAuthMessage("");
-    } else {
-      showAuthMessage(
-        "登録が完了しました。確認メールが届いた場合は、メール認証後にログインしてください。"
-      );
-    }
-
-  } catch (error) {
-    console.error("SIGNUP ERROR:",error);
-    showAuthMessage("登録エラー: " + error.message,true);
-
-  } finally {
-    signupRunning = false;
-    button.disabled = false;
-    button.textContent = "アカウントを作成";
-  }
-}
-
-window.signup = signup;
-
-
-/* ======================================
-   画面切り替え
-====================================== */
-
-$("showSignup").addEventListener("click",() => {
-  $("loginForm").classList.add("hidden");
-  $("signupForm").classList.remove("hidden");
-  showAuthMessage("");
-});
-
-$("showLogin").addEventListener("click",() => {
-  $("signupForm").classList.add("hidden");
-  $("loginForm").classList.remove("hidden");
-  showAuthMessage("");
-});
-
-$("loginPassword").addEventListener("keydown",event => {
-  if (event.key === "Enter") login();
-});
-
-$("loginEmail").addEventListener("keydown",event => {
-  if (event.key === "Enter") $("loginPassword").focus();
-});
-
-
-/* ======================================
-   ユーザー検索
-====================================== */
-
-$("userSearch").addEventListener("input",() => {
-  clearTimeout(searchTimer);
-
-  const keyword = $("userSearch").value.trim();
-
-  searchTimer = setTimeout(() => {
-    searchUsers(keyword);
-  },350);
-});
-
-async function searchUsers(keyword) {
-  const results = $("searchResults");
-
-  if (!keyword) {
-    results.innerHTML = "";
-    return;
-  }
-
-  if (!currentUser) return;
-
-  results.textContent = "検索中...";
-
-  const {data,error} = await db
-    .from("profiles")
-    .select("id,display_name")
-    .neq("id",currentUser.id)
-    .ilike("display_name","%" + keyword + "%")
-    .order("display_name")
-    .limit(20);
-
-  if (error) {
-    results.textContent = "検索エラー: " + error.message;
-    return;
-  }
-
-  if (!data.length) {
-    results.textContent = "ユーザーが見つかりません。";
-    return;
-  }
-
-  results.innerHTML = data.map(user => `
-    <div class="user-result"
-      data-id="${escapeHTML(user.id)}"
-      data-name="${escapeHTML(user.display_name)}">
-
-      <div class="avatar">${escapeHTML(initial(user.display_name))}</div>
-
-      <div class="user-result-info">
-        <strong>${escapeHTML(user.display_name)}</strong>
-        <small>GATE MESSAGE USER</small>
-      </div>
-      <span>＋</span>
-    </div>
-  `).join("");
-
-  results.querySelectorAll(".user-result").forEach(item => {
-    item.addEventListener("click",() => {
-      startDirectChat(item.dataset.id,item.dataset.name);
-    });
-  });
-}
-
-
-/* ======================================
-   1対1トーク
-====================================== */
-
-async function startDirectChat(otherId,otherName) {
-  try {
-    setStatus("トークを準備しています...");
-
-    const {data,error} = await db.rpc("gm_start_direct_chat",{
-      p_other_user_id:otherId
-    });
-
-    if (error) throw error;
-
-    if (!data) throw new Error("トークIDを取得できません。");
-
-    $("userSearch").value = "";
-    $("searchResults").innerHTML = "";
-
-    await loadConversations();
-    await openConversation(data,otherName);
-
-    setStatus("GATE MESSAGE / SECURE CHAT");
-
-  } catch (error) {
-    console.error(error);
-    alert("トーク開始エラー: " + error.message);
-  }
-}
-
-
-/* ======================================
-   トーク一覧
-====================================== */
-
-async function loadConversations() {
-  if (!currentUser) return;
-
-  const list = $("conversationList");
-
-  const {data:memberships,error} = await db
-    .from("gm_conversation_members")
-    .select("conversation_id")
-    .eq("user_id",currentUser.id);
-
-  if (error) {
-    list.textContent = "トーク一覧エラー: " + error.message;
-    return;
-  }
-
-  if (!memberships?.length) {
-    conversationsCache = [];
-    list.textContent = "まだトークはありません。";
-    return;
-  }
-
-  const ids = memberships.map(x => x.conversation_id);
-
-  const {data:conversations,error:conversationError} = await db
-    .from("gm_conversations")
-    .select("id,conversation_type,title,created_at")
-    .in("id",ids)
-    .order("created_at",{ascending:false});
-
-  if (conversationError) throw conversationError;
-
-  const {data:members,error:memberError} = await db
-    .from("gm_conversation_members")
-    .select("conversation_id,user_id")
-    .in("conversation_id",ids);
-
-  if (memberError) throw memberError;
-
-  const otherIds = [...new Set(
-    (members || [])
-      .filter(m => m.user_id !== currentUser.id)
-      .map(m => m.user_id)
-  )];
-
-  let profiles = [];
-
-  if (otherIds.length) {
-    const {data,error:profileError} = await db
-      .from("profiles")
-      .select("id,display_name")
-      .in("id",otherIds);
-
-    if (profileError) throw profileError;
-
-    profiles = data || [];
-  }
-
-  const {data:latestMessages,error:messageError} = await db
-    .from("gm_messages")
-    .select("conversation_id,content,created_at")
-    .in("conversation_id",ids)
-    .order("created_at",{ascending:false})
-    .limit(200);
-
-  if (messageError) throw messageError;
-
-  conversationsCache = (conversations || []).map(c => {
-    const other = (members || []).find(
-      m => m.conversation_id === c.id &&
-      m.user_id !== currentUser.id
-    );
-
-    const profile = profiles.find(p => p.id === other?.user_id);
-
-    const latest = (latestMessages || []).find(
-      m => m.conversation_id === c.id
-    );
-
-    return {
-      ...c,
-      name:c.conversation_type === "group"
-        ? c.title || "グループ"
-        : profile?.display_name || "ユーザー",
-      lastMessage:latest?.content || "メッセージはありません",
-      lastTime:latest?.created_at || c.created_at
-    };
-  });
-
-  renderConversationList();
-}
-
-
-/* ======================================
-   トーク一覧描画
-====================================== */
-
-function renderConversationList() {
-  const list = $("conversationList");
-
-  if (!conversationsCache.length) {
-    list.textContent = "トークはありません。";
-    return;
-  }
-
-  list.innerHTML = conversationsCache.map(c => `
-    <div class="conversation-item ${currentConversation === c.id ? "active" : ""}"
-      data-id="${escapeHTML(c.id)}"
-      data-name="${escapeHTML(c.name)}">
-
-      <div class="avatar">${escapeHTML(initial(c.name))}</div>
-
-      <div class="conversation-info">
-        <strong>${escapeHTML(c.name)}</strong>
-        <small>${escapeHTML(c.lastMessage)}</small>
-      </div>
-
-      <small>${escapeHTML(timeText(c.lastTime))}</small>
-    </div>
-  `).join("");
-
-  list.querySelectorAll(".conversation-item").forEach(item => {
-    item.addEventListener("click",() => {
-      openConversation(item.dataset.id,item.dataset.name);
-    });
-  });
-}
-
-
-/* ======================================
-   トーク画面
-====================================== */
-
-async function openConversation(id,name) {
-  currentConversation = id;
-  currentConversationName = name;
-
-  $("chatEmpty").classList.add("hidden");
-  $("chatContent").classList.remove("hidden");
-  $("chatContent").style.display = "flex";
-
-  $("chatTitle").textContent = name;
-  $("chatAvatar").textContent = initial(name);
-
-  $("mainLayout").classList.add("chat-open");
-
-  renderConversationList();
-
-  await loadMessages();
-  subscribeMessages(id);
-}
-
-
-/* ======================================
-   メッセージ取得
-====================================== */
-
-async function loadMessages() {
-  if (!currentConversation) return;
-
-  const id = currentConversation;
-  const box = $("messages");
-
-  const {data,error} = await db
-    .from("gm_messages")
-    .select("id,conversation_id,sender_id,content,created_at")
-    .eq("conversation_id",id)
-    .order("created_at",{ascending:true})
-    .limit(500);
-
-  if (error) {
-    box.textContent = "メッセージ取得エラー: " + error.message;
-    return;
-  }
-
-  if (currentConversation !== id) return;
-
-  renderMessages(data || []);
-}
-
-
-/* ======================================
-   メッセージ描画
-====================================== */
-
-function renderMessages(messages) {
-  const box = $("messages");
-
-  if (!messages.length) {
-    box.innerHTML =
-      '<div style="margin:auto;color:#8793a6">会話を始めましょう！</div>';
-    return;
-  }
-
-  box.innerHTML = messages.map(m => {
-    const mine = m.sender_id === currentUser.id;
-
-    return `
-      <div class="message-row ${mine ? "mine" : ""}">
-        ${mine ? "" : `
-          <div class="message-sender">
-            ${escapeHTML(currentConversationName)}
-          </div>
-        `}
-
-        <div class="bubble">${escapeHTML(m.content)}</div>
-
-        <div class="message-time">
-          ${escapeHTML(timeText(m.created_at))}
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  box.scrollTop = box.scrollHeight;
-}
-
-
-/* ======================================
-   メッセージ送信
-====================================== */
-
-async function sendMessage() {
-  if (!currentUser || !currentConversation) return;
-
-  const input = $("messageInput");
-  const button = $("sendButton");
-  const content = input.value.trim();
-
-  if (!content) return;
-
-  const id = currentConversation;
-
-  button.disabled = true;
-
-  try {
-    const {error} = await db
-      .from("gm_messages")
-      .insert({
-        conversation_id:id,
-        sender_id:currentUser.id,
-        content
-      });
-
-    if (error) throw error;
-
-    input.value = "";
-
-    if (currentConversation === id) {
-      await loadMessages();
-    }
-
-    await loadConversations();
-
-  } catch (error) {
-    alert("送信エラー: " + error.message);
-  } finally {
-    button.disabled = false;
-    input.focus();
-  }
-}
-
-$("sendButton").addEventListener("click",sendMessage);
-
-$("messageInput").addEventListener("keydown",event => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
-  }
-});
-
-
-/* ======================================
-   リアルタイム
-====================================== */
-
-function unsubscribeMessages() {
-  if (messageSubscription && db) {
-    db.removeChannel(messageSubscription);
-  }
-
-  messageSubscription = null;
-}
-
-function subscribeMessages(id) {
-  unsubscribeMessages();
-
-  messageSubscription = db
-    .channel("gm-chat-" + id)
-    .on(
-      "postgres_changes",
-      {
-        event:"INSERT",
-        schema:"public",
-        table:"gm_messages",
-        filter:"conversation_id=eq." + id
-      },
-      async payload => {
-        if (currentConversation !== id) return;
-
-        if (payload.new.sender_id === currentUser.id) return;
-
-        await loadMessages();
-        await loadConversations();
-      }
-    )
-    .subscribe();
-}
-
-
-/* ======================================
-   戻る
-====================================== */
-
-$("backButton").addEventListener("click",() => {
-  $("mainLayout").classList.remove("chat-open");
-
-  unsubscribeMessages();
-
-  currentConversation = null;
-  currentConversationName = "";
-
-  $("chatContent").classList.add("hidden");
-  $("chatContent").style.display = "none";
-
-  $("chatEmpty").classList.remove("hidden");
-
-  renderConversationList();
-});
-
-
-/* ======================================
-   ログアウト
-====================================== */
-
-$("logoutButton").addEventListener("click",async () => {
-  if (!confirm("ログアウトしますか？")) return;
-
-  signingOut = true;
-  unsubscribeMessages();
-
-  try {
-    const {error} = await db.auth.signOut();
-
-    if (error) throw error;
-
-    currentUser = null;
-    currentProfile = null;
-    currentConversation = null;
-    currentConversationName = "";
-    appReadyUserId = null;
-    conversationsCache = [];
-
-    showLoginScreen("ログアウトしました。");
-
-  } catch (error) {
-    alert("ログアウトエラー: " + error.message);
-  } finally {
-    signingOut = false;
-  }
-});
-
-
-/* ======================================
-   認証状態監視
-====================================== */
-
-async function initializePage() {
-  try {
-    initializeSupabase();
-
-    const {data,error} = await db.auth.getSession();
-
-    if (error) throw error;
-
-    if (data.session?.user) {
-      await activateApplication(data.session.user);
-    } else {
-      showLoginScreen("");
-    }
-
-    db.auth.onAuthStateChange((event,session) => {
-      if (event === "INITIAL_SESSION") return;
-
-      setTimeout(async () => {
-        if (session?.user) {
-          if (appReadyUserId !== session.user.id) {
-            try {
-              await activateApplication(session.user);
-            } catch (error) {
-              console.error(error);
-              showLoginScreen(
-                "初期化エラー: " + error.message
-              );
-            }
-          }
-        } else if (!signingOut) {
-          currentUser = null;
-          currentProfile = null;
-          currentConversation = null;
-          currentConversationName = "";
-          appReadyUserId = null;
-
-          unsubscribeMessages();
-
-          showLoginScreen("");
-        }
-      },0);
-    });
-
-  } catch (error) {
-    console.error("INITIALIZATION ERROR:",error);
-
-    showLoginScreen(
-      "起動エラー: " + error.message
-    );
-  }
-}
-
-
-/* ======================================
-   エラー表示
-====================================== */
-
-window.addEventListener("error",event => {
-  console.error("JAVASCRIPT ERROR:",event.error || event.message);
-
-  if (!$("appScreen").classList.contains("hidden")) {
-    setStatus("JavaScriptエラーが発生しました。");
-  } else {
-    showAuthMessage(
-      "ページの処理でエラーが発生しました: " + event.message,
-      true
-    );
-  }
-});
-
-window.addEventListener("unhandledrejection",event => {
-  console.error("PROMISE ERROR:",event.reason);
-
-  const message = event.reason?.message || String(event.reason);
-
-  if ($("authScreen") && !$("authScreen").classList.contains("hidden")) {
-    showAuthMessage("処理エラー: " + message,true);
-  }
-});
-
-
-/* ======================================
-   起動
-====================================== */
-
-initializePage();
-
 </script>
 </body>
 </html>
