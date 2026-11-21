@@ -2,273 +2,2731 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#087cff">
 <title>GATE MESSAGE</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
-:root{--blue:#168cff;--bg:#f3f6fb;--panel:#fff;--text:#172033;--muted:#8994a7;--line:#e5eaf1;--bubble:#fff}
-body.dark{--bg:#101725;--panel:#192437;--text:#edf4ff;--muted:#9baac0;--line:#2b3b52;--bubble:#24334a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans JP",sans-serif}
-button,input,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
-#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(140deg,#06162d,#087cff)}
-.login-card{width:100%;max-width:410px;background:white;color:#172033;padding:28px;border-radius:22px;box-shadow:0 15px 60px #001b4540}
-.logo{font-size:24px;font-weight:900;letter-spacing:1px}.logo span{color:var(--blue)}.gate-logo{display:flex;align-items:center;gap:8px}.torii{width:35px;height:35px;filter:drop-shadow(0 0 7px #168cff)}
-.sub{color:#8994a7;font-size:13px;margin:8px 0 20px}.field{width:100%;padding:13px;border:1px solid #e5eaf1;border-radius:11px;margin:7px 0;outline:none}
-.primary{background:var(--blue);color:white;border:0;padding:12px;border-radius:11px;font-weight:bold;width:100%;margin-top:9px}
-.secondary{background:#e8f2ff;color:#087cff;border:0;padding:10px;border-radius:10px}.danger{background:#ffe9e9;color:#d22;border:0;padding:10px;border-radius:10px}
-.linkbtn{border:0;background:none;color:#087cff;padding:12px 5px;width:100%}#authMessage{font-size:12px;color:#d33;min-height:18px}
-#app{max-width:1400px;margin:auto;height:100dvh;display:flex;background:var(--panel);overflow:hidden}.sidebar{width:350px;min-width:290px;border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--panel)}
-.top{padding:16px;border-bottom:1px solid var(--line)}.topline{display:flex;justify-content:space-between;align-items:center}.search{width:100%;padding:12px;border:0;background:var(--bg);color:var(--text);border-radius:11px;margin-top:14px;outline:none}
-.tabs{display:flex;gap:14px;margin-top:14px;font-size:13px;color:var(--muted);flex-wrap:wrap}.tabs span{cursor:pointer}.tabs span:hover{color:var(--blue)}
-#chatList{overflow:auto;flex:1}.chat-item{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--line)}.chat-item:hover{background:var(--bg)}
-.avatar{width:45px;height:45px;flex-shrink:0;border-radius:50%;background:#dceaff;display:flex;align-items:center;justify-content:center;color:#087cff;font-weight:bold;font-size:18px;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}
-.chat-info{flex:1;min-width:0}.chat-name{font-weight:bold;font-size:14px}.chat-preview{color:var(--muted);font-size:12px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.time{font-size:10px;color:var(--muted)}
-.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--panel)}.chat-header{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 15px;gap:10px}
-.chat-header-info{flex:1;min-width:0}.chat-header-name{font-weight:bold}.chat-status{font-size:11px;color:var(--muted);margin-top:4px}.icon-btn{border:0;background:transparent;font-size:20px;padding:8px;color:var(--muted);border-radius:10px}
-#messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}.msg-row{display:flex;flex-direction:column;max-width:78%;align-items:flex-start}.msg-row.mine{align-self:flex-end;align-items:flex-end}
-.bubble{background:var(--bubble);padding:11px 14px;border-radius:16px;box-shadow:0 1px 4px #0000000a;font-size:14px;line-height:1.6;overflow-wrap:anywhere}.mine .bubble{background:var(--blue);color:white;border-bottom-right-radius:5px}
-.msg-meta{font-size:10px;color:var(--muted);margin-top:4px}.bubble img,.bubble video{display:block;max-width:100%;max-height:320px;border-radius:12px}.sticker{font-size:55px;padding:7px}.msg-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}.msg-actions button{border:0;background:var(--bg);color:var(--muted);border-radius:8px;padding:5px 8px;font-size:11px}
-.composer{border-top:1px solid var(--line);padding:11px 15px 15px;background:var(--panel)}.tools{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap}.tool{border:0;background:var(--bg);color:var(--text);border-radius:9px;padding:8px 10px;font-size:13px}
-.sendline{display:flex;align-items:center;gap:9px}#messageInput{flex:1;border:0;background:var(--bg);color:var(--text);border-radius:22px;padding:13px 16px;outline:none;min-width:0}.send{background:var(--blue);color:white;border:0;border-radius:50%;width:44px;height:44px}
-.empty{margin:auto;text-align:center;color:var(--muted);padding:25px}#mobileBack{display:none}
-#userPanel{position:fixed;right:18px;top:65px;background:var(--panel);padding:10px;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px #0002;z-index:20;min-width:220px;max-height:80vh;overflow:auto}
-.menu-btn{display:block;width:100%;padding:11px;text-align:left;border:0;background:transparent;color:var(--text);border-radius:8px;font-size:13px}.menu-btn:hover{background:var(--bg)}
-#notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#172033;color:white;padding:12px 18px;border-radius:12px;z-index:50;font-size:13px;max-width:90%;display:none}
-.modal{position:fixed;inset:0;background:#0008;z-index:30;display:flex;align-items:center;justify-content:center;padding:15px}.modal-card{background:var(--panel);color:var(--text);border-radius:18px;padding:22px;width:100%;max-width:440px;max-height:85vh;overflow:auto}
-.modal-card h3{margin-top:0}.modal-card input,.modal-card textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);margin:7px 0}.modal-actions{display:flex;gap:8px;margin-top:12px}.modal-actions button{flex:1}
-.friend-code{font-size:22px;font-weight:bold;letter-spacing:3px;text-align:center;padding:12px;color:var(--blue)}#qrCode{display:flex;justify-content:center;padding:15px}
-.online-dot{display:inline-block;width:8px;height:8px;background:#25bd70;border-radius:50%;margin-right:5px}.context-menu{position:fixed;z-index:60;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:7px;box-shadow:0 8px 30px #0003;min-width:190px}
-.context-menu button{display:block;width:100%;text-align:left;padding:11px;border:0;background:transparent;color:var(--text);border-radius:7px}.context-menu button:hover{background:var(--bg)}
-@media(max-width:700px){#app{height:100dvh}.sidebar{width:100%;min-width:0;border:0}.main{display:none;width:100%}#app.in-chat .sidebar{display:none}#app.in-chat .main{display:flex}#mobileBack{display:block}.chat-header{height:64px;padding:0 8px}#messages{padding:13px}.msg-row{max-width:88%}.composer{padding:9px}.top{padding:13px}}
+:root {
+  --blue:#168cff;
+  --blue-dark:#0872dc;
+  --bg:#f3f6fb;
+  --panel:#ffffff;
+  --text:#172033;
+  --muted:#8994a7;
+  --line:#e5eaf1;
+  --bubble:#ffffff;
+  --mine:#168cff;
+  --danger:#e34d59;
+  --success:#21a66b;
+}
+body.dark {
+  --bg:#101725;
+  --panel:#192437;
+  --text:#edf4ff;
+  --muted:#9baac0;
+  --line:#2b3b52;
+  --bubble:#24334a;
+}
+* {
+  box-sizing:border-box;
+}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,"Noto Sans JP",sans-serif;
+}
+button,input,textarea {
+  font:inherit;
+}
+button {
+  cursor:pointer;
+}
+.hidden {
+  display:none!important;
+}
+button:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+/* ログイン */
+#loginScreen {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(140deg,#06162d,#087cff);
+}
+.login-card {
+  width:100%;
+  max-width:420px;
+  background:#fff;
+  color:#172033;
+  padding:30px;
+  border-radius:22px;
+  box-shadow:0 15px 60px #001b4540;
+}
+.logo-area {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.logo {
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.logo span {
+  color:#168cff;
+}
+.torii {
+  width:42px;
+  height:42px;
+}
+.login-description {
+  color:#8994a7;
+  font-size:13px;
+  margin:12px 0 22px;
+}
+.field {
+  width:100%;
+  padding:14px;
+  border:1px solid #e5eaf1;
+  border-radius:11px;
+  margin:7px 0;
+  outline:none;
+}
+.field:focus {
+  border-color:#168cff;
+}
+.primary {
+  background:#168cff;
+  color:#fff;
+  border:0;
+  padding:13px;
+  border-radius:11px;
+  font-weight:bold;
+  width:100%;
+  margin-top:10px;
+}
+.primary:hover {
+  background:#0872dc;
+}
+.secondary {
+  background:#e8f2ff;
+  color:#087cff;
+  border:0;
+  padding:10px 13px;
+  border-radius:10px;
+}
+.danger {
+  background:#ffe9e9;
+  color:#d22;
+  border:0;
+  padding:10px 13px;
+  border-radius:10px;
+}
+.link-button {
+  border:0;
+  background:none;
+  color:#087cff;
+  padding:13px 5px;
+  width:100%;
+}
+#authMessage {
+  font-size:12px;
+  color:#d33;
+  min-height:20px;
+  overflow-wrap:anywhere;
+}
+
+/* メイン画面 */
+#app {
+  max-width:1500px;
+  margin:auto;
+  height:100dvh;
+  display:flex;
+  background:var(--panel);
+  overflow:hidden;
+}
+.sidebar {
+  width:350px;
+  min-width:290px;
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  background:var(--panel);
+}
+.sidebar-top {
+  padding:16px;
+  border-bottom:1px solid var(--line);
+}
+.topline {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.search {
+  width:100%;
+  padding:12px;
+  border:0;
+  background:var(--bg);
+  color:var(--text);
+  border-radius:11px;
+  margin-top:14px;
+  outline:none;
+}
+.tabs {
+  display:flex;
+  gap:15px;
+  margin-top:14px;
+  font-size:13px;
+  color:var(--muted);
+  flex-wrap:wrap;
+}
+.tabs button {
+  border:0;
+  background:none;
+  color:inherit;
+  padding:3px 0;
+}
+.tabs button.active {
+  color:var(--blue);
+  font-weight:bold;
+}
+#chatList {
+  overflow:auto;
+  flex:1;
+}
+.chat-item {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px 14px;
+  cursor:pointer;
+  border-bottom:1px solid var(--line);
+}
+.chat-item:hover {
+  background:var(--bg);
+}
+.chat-item.selected {
+  background:var(--bg);
+}
+.avatar {
+  width:45px;
+  height:45px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:#dceaff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#087cff;
+  font-weight:bold;
+  font-size:18px;
+  overflow:hidden;
+}
+.avatar img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.chat-info {
+  flex:1;
+  min-width:0;
+}
+.chat-name {
+  font-weight:bold;
+  font-size:14px;
+}
+.chat-preview {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.chat-time {
+  font-size:10px;
+  color:var(--muted);
+}
+.my-account {
+  padding:12px;
+  border-top:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.my-account-info {
+  flex:1;
+  min-width:0;
+}
+.my-account-name {
+  font-weight:bold;
+  font-size:13px;
+}
+.my-account-caption {
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+/* チャット */
+.main {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  background:var(--panel);
+}
+.chat-header {
+  min-height:70px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  padding:0 15px;
+  gap:10px;
+}
+.chat-header-info {
+  flex:1;
+  min-width:0;
+}
+.chat-header-name {
+  font-weight:bold;
+}
+.chat-status {
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.icon-button {
+  border:0;
+  background:transparent;
+  font-size:20px;
+  padding:8px;
+  color:var(--muted);
+  border-radius:10px;
+}
+.icon-button:hover {
+  background:var(--bg);
+}
+#messages {
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  background:var(--bg);
+}
+.message-row {
+  display:flex;
+  flex-direction:column;
+  max-width:78%;
+  align-items:flex-start;
+}
+.message-row.mine {
+  align-self:flex-end;
+  align-items:flex-end;
+}
+.bubble {
+  background:var(--bubble);
+  padding:11px 14px;
+  border-radius:16px;
+  box-shadow:0 1px 4px #0000000a;
+  font-size:14px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+.message-row.mine .bubble {
+  background:var(--mine);
+  color:white;
+  border-bottom-right-radius:5px;
+}
+.bubble img,
+.bubble video {
+  display:block;
+  max-width:100%;
+  max-height:340px;
+  border-radius:12px;
+}
+.sticker-message {
+  font-size:55px;
+  padding:7px;
+}
+.message-meta {
+  font-size:10px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.message-actions {
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+.message-actions button {
+  border:0;
+  background:var(--bg);
+  color:var(--muted);
+  border-radius:8px;
+  padding:5px 8px;
+  font-size:11px;
+}
+.composer {
+  border-top:1px solid var(--line);
+  padding:11px 15px 15px;
+  background:var(--panel);
+}
+.composer-tools {
+  display:flex;
+  gap:7px;
+  margin-bottom:9px;
+  flex-wrap:wrap;
+}
+.tool-button {
+  border:0;
+  background:var(--bg);
+  color:var(--text);
+  border-radius:9px;
+  padding:8px 10px;
+  font-size:13px;
+}
+.send-line {
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+#messageInput {
+  flex:1;
+  border:0;
+  background:var(--bg);
+  color:var(--text);
+  border-radius:22px;
+  padding:13px 16px;
+  outline:none;
+  min-width:0;
+}
+.send-button {
+  background:var(--blue);
+  color:white;
+  border:0;
+  border-radius:50%;
+  width:44px;
+  height:44px;
+  font-size:18px;
+}
+.empty {
+  margin:auto;
+  text-align:center;
+  color:var(--muted);
+  padding:25px;
+}
+#mobileBack {
+  display:none;
+}
+
+/* メニュー・モーダル */
+#userPanel {
+  position:fixed;
+  right:18px;
+  top:65px;
+  background:var(--panel);
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:0 10px 30px #0002;
+  z-index:20;
+  min-width:230px;
+  max-height:80vh;
+  overflow:auto;
+}
+.menu-button {
+  display:block;
+  width:100%;
+  padding:11px;
+  text-align:left;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  border-radius:8px;
+  font-size:13px;
+}
+.menu-button:hover {
+  background:var(--bg);
+}
+#notice {
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#172033;
+  color:white;
+  padding:12px 18px;
+  border-radius:12px;
+  z-index:80;
+  font-size:13px;
+  max-width:90%;
+  display:none;
+  overflow-wrap:anywhere;
+}
+.modal {
+  position:fixed;
+  inset:0;
+  background:#0008;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+}
+.modal-card {
+  background:var(--panel);
+  color:var(--text);
+  border-radius:18px;
+  padding:22px;
+  width:100%;
+  max-width:460px;
+  max-height:85vh;
+  overflow:auto;
+}
+.modal-card h3 {
+  margin-top:0;
+}
+.modal-card input,
+.modal-card textarea {
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--bg);
+  color:var(--text);
+  margin:7px 0;
+}
+.modal-actions {
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+.modal-actions button {
+  flex:1;
+}
+.friend-code {
+  font-size:22px;
+  font-weight:bold;
+  letter-spacing:3px;
+  text-align:center;
+  padding:12px;
+  color:var(--blue);
+}
+#qrCode {
+  display:flex;
+  justify-content:center;
+  padding:15px;
+}
+.online-dot {
+  display:inline-block;
+  width:8px;
+  height:8px;
+  background:#25bd70;
+  border-radius:50%;
+  margin-right:5px;
+}
+.context-menu {
+  position:fixed;
+  z-index:70;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:7px;
+  box-shadow:0 8px 30px #0003;
+  min-width:190px;
+}
+.context-menu button {
+  display:block;
+  width:100%;
+  text-align:left;
+  padding:11px;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  border-radius:7px;
+}
+
+/* スタンプ */
+#stickerPanel {
+  padding:8px 0;
+}
+#stickerGrid {
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:7px;
+}
+#stickerGrid button {
+  font-size:26px;
+  border:0;
+  padding:8px;
+  background:var(--bg);
+  border-radius:8px;
+}
+
+/* モバイル */
+@media(max-width:700px) {
+  #app {
+    height:100dvh;
+  }
+  .sidebar {
+    width:100%;
+    min-width:0;
+    border:0;
+  }
+  .main {
+    display:none;
+    width:100%;
+  }
+  #app.in-chat .sidebar {
+    display:none;
+  }
+  #app.in-chat .main {
+    display:flex;
+  }
+  #mobileBack {
+    display:block;
+  }
+  .chat-header {
+    min-height:64px;
+    padding:0 8px;
+  }
+  #messages {
+    padding:13px;
+  }
+  .message-row {
+    max-width:88%;
+  }
+  .composer {
+    padding:9px;
+  }
+  .sidebar-top {
+    padding:13px;
+  }
+}
 </style>
 </head>
+
 <body>
-<section id="login">
- <div class="login-card">
-  <div class="gate-logo"><svg class="torii" viewBox="0 0 100 100" fill="none" stroke="#168cff" stroke-width="7" stroke-linecap="round"><path d="M12 25 Q50 12 88 25"/><path d="M20 34 H80 M28 34 V85 M72 34 V85 M20 48 H80"/></svg><div class="logo">GATE <span>MESSAGE</span></div></div>
-  <div class="sub">Connect with everyone.</div>
-  <div id="loginForm">
-   <input id="email" class="field" type="email" placeholder="メールアドレス" autocomplete="email">
-   <input id="password" class="field" type="password" placeholder="パスワード" autocomplete="current-password">
-   <button class="primary" onclick="login()">ログイン</button>
-   <button class="linkbtn" onclick="showSignup()">新規登録はこちら</button>
+
+<!-- ログイン画面 -->
+<section id="loginScreen">
+  <div class="login-card">
+
+    <div class="logo-area">
+      <svg class="torii" viewBox="0 0 100 100" fill="none"
+           stroke="#168cff" stroke-width="7" stroke-linecap="round">
+        <path d="M12 25 Q50 12 88 25"/>
+        <path d="M20 34 H80"/>
+        <path d="M28 34 V85"/>
+        <path d="M72 34 V85"/>
+        <path d="M20 48 H80"/>
+      </svg>
+      <div class="logo">GATE <span>MESSAGE</span></div>
+    </div>
+
+    <div class="login-description">
+      Connect with everyone.
+    </div>
+
+    <div id="loginForm">
+      <input id="loginEmail" class="field"
+             type="email" placeholder="メールアドレス">
+      <input id="loginPassword" class="field"
+             type="password" placeholder="パスワード">
+      <button class="primary" onclick="login()">ログイン</button>
+      <button class="link-button" onclick="showSignup()">
+        新規登録はこちら
+      </button>
+    </div>
+
+    <div id="signupForm" class="hidden">
+      <input id="signupName" class="field"
+             placeholder="表示名" maxlength="40">
+      <input id="signupEmail" class="field"
+             type="email" placeholder="メールアドレス">
+      <input id="signupPassword" class="field"
+             type="password" placeholder="パスワード（6文字以上）">
+      <input id="signupPasswordConfirm" class="field"
+             type="password" placeholder="パスワード（確認）">
+      <button class="primary" onclick="signup()">
+        アカウントを新規登録
+      </button>
+      <button class="link-button" onclick="showLogin()">
+        ログインに戻る
+      </button>
+    </div>
+
+    <p id="authMessage"></p>
   </div>
-  <div id="signupForm" class="hidden">
-   <input id="signupName" class="field" placeholder="表示名" maxlength="40">
-   <input id="signupEmail" class="field" type="email" placeholder="メールアドレス" autocomplete="email">
-   <input id="signupPassword" class="field" type="password" placeholder="パスワード（6文字以上）" autocomplete="new-password">
-   <input id="signupPassword2" class="field" type="password" placeholder="パスワード（確認）" autocomplete="new-password">
-   <button class="primary" onclick="signup()">アカウントを新規登録</button>
-   <button class="linkbtn" onclick="showLogin()">ログインに戻る</button>
-  </div>
-  <p id="authMessage"></p>
- </div>
 </section>
+
+<!-- アプリ本体 -->
 <div id="app" class="hidden">
- <aside class="sidebar">
-  <div class="top">
-   <div class="topline"><div class="logo">GATE <span>MESSAGE</span></div><button class="icon-btn" onclick="showFriendCode()">＋</button></div>
-   <input class="search" id="search" placeholder="チャットを検索">
-   <div class="tabs"><span onclick="showChats()">チャット</span><span onclick="showFriends()">友だち</span><span onclick="showHiddenChats()">非表示</span><span onclick="showFriendCode()">友だち追加 ＋</span></div>
-  </div>
-  <div id="chatList"></div>
-  <div style="padding:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:9px">
-   <div class="avatar" id="myAvatar">G</div><div style="flex:1;min-width:0"><b id="myName">ユーザー</b><div style="font-size:11px;color:var(--muted)">GATE MESSAGE</div></div><button class="icon-btn" onclick="toggleMenu()">⚙</button>
-  </div>
- </aside>
- <main class="main">
-  <header class="chat-header"><button class="icon-btn" id="mobileBack" onclick="backToList()">‹</button><div class="avatar" id="peerAvatar">G</div><div class="chat-header-info"><div class="chat-header-name" id="peerName">チャット</div><div class="chat-status" id="peerStatus">GATE MESSAGE</div></div><button class="icon-btn" onclick="callNotice('音声通話機能は準備中です')">☎</button><button class="icon-btn" onclick="callNotice('ビデオ通話機能は準備中です')">▣</button><button class="icon-btn" onclick="toggleMenu()">⋯</button></header>
-  <div id="messages"><div class="empty">会話を選択してください</div></div>
-  <div class="composer">
-   <div class="tools"><button class="tool" onclick="$('photoFile').click()">📷 写真</button><button class="tool" onclick="$('videoFile').click()">🎥 動画</button><button class="tool" onclick="toggleStickers()">😊 スタンプ</button></div>
-   <div id="stickerPanel" class="hidden"><div id="stickerGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px"></div></div>
-   <div class="sendline"><input id="messageInput" placeholder="メッセージを入力..."><button class="send" onclick="sendMessage()">➤</button></div>
-   <input id="photoFile" type="file" accept="image/*" multiple hidden><input id="videoFile" type="file" accept="video/mp4,video/webm" multiple hidden>
-  </div>
- </main>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-top">
+      <div class="topline">
+        <div class="logo">GATE <span>MESSAGE</span></div>
+        <button class="icon-button" onclick="showFriendCode()">＋</button>
+      </div>
+
+      <input id="searchInput" class="search"
+             placeholder="チャットを検索">
+
+      <div class="tabs">
+        <button id="tabChats" class="active" onclick="showChats()">チャット</button>
+        <button id="tabFriends" onclick="showFriends()">友だち</button>
+        <button onclick="showHiddenChats()">非表示</button>
+        <button onclick="showFriendCode()">友だち追加 ＋</button>
+      </div>
+    </div>
+
+    <div id="chatList"></div>
+
+    <div class="my-account">
+      <div class="avatar" id="myAvatar">G</div>
+      <div class="my-account-info">
+        <div class="my-account-name" id="myName">ユーザー</div>
+        <div class="my-account-caption">GATE MESSAGE</div>
+      </div>
+      <button class="icon-button" onclick="toggleMenu()">⚙</button>
+    </div>
+
+  </aside>
+
+  <main class="main">
+
+    <header class="chat-header">
+      <button id="mobileBack" class="icon-button"
+              onclick="backToList()">‹</button>
+
+      <div class="avatar" id="peerAvatar">G</div>
+
+      <div class="chat-header-info">
+        <div class="chat-header-name" id="peerName">チャット</div>
+        <div class="chat-status" id="peerStatus">GATE MESSAGE</div>
+      </div>
+
+      <button class="icon-button"
+              onclick="callNotice('音声通話機能は準備中です')">☎</button>
+      <button class="icon-button"
+              onclick="callNotice('ビデオ通話機能は準備中です')">▣</button>
+      <button class="icon-button" onclick="toggleMenu()">⋯</button>
+    </header>
+
+    <div id="messages">
+      <div class="empty">会話を選択してください</div>
+    </div>
+
+    <div class="composer">
+
+      <div class="composer-tools">
+        <button class="tool-button"
+                onclick="document.getElementById('photoFile').click()">
+          📷 写真
+        </button>
+        <button class="tool-button"
+                onclick="document.getElementById('videoFile').click()">
+          🎥 動画
+        </button>
+        <button class="tool-button" onclick="toggleStickers()">
+          😊 スタンプ
+        </button>
+      </div>
+
+      <div id="stickerPanel" class="hidden">
+        <div id="stickerGrid"></div>
+      </div>
+
+      <div class="send-line">
+        <input id="messageInput" placeholder="メッセージを入力...">
+        <button class="send-button" onclick="sendMessage()">➤</button>
+      </div>
+
+      <input id="photoFile" type="file" accept="image/*" multiple hidden>
+      <input id="videoFile" type="file"
+             accept="video/mp4,video/webm" multiple hidden>
+    </div>
+
+  </main>
 </div>
+
+<!-- 設定メニュー -->
 <div id="userPanel" class="hidden">
- <button class="menu-btn" onclick="editProfile()">プロフィール編集</button><button class="menu-btn" onclick="uploadAvatar()">プロフィール画像変更</button><button class="menu-btn" onclick="showFriendCode()">友だちコード・QR</button><button class="menu-btn" onclick="createGroup()">グループ作成</button><button class="menu-btn" onclick="showGroupMembers()">グループメンバー</button><button class="menu-btn" onclick="leaveGroup()">グループ退出</button><button class="menu-btn" onclick="hideConversation()">チャットを非表示</button><button class="menu-btn" onclick="deleteConversation()">自分の一覧から削除</button><button class="menu-btn" onclick="toggleBlock()">ブロック・解除</button><button class="menu-btn" onclick="reportUser()">ユーザーを通報</button><button class="menu-btn" onclick="toggleTheme()">白・黒テーマ切替</button><button class="menu-btn" onclick="logout()">ログアウト</button><button class="menu-btn" onclick="toggleMenu()">閉じる</button>
+  <button class="menu-button" onclick="editProfile()">プロフィール編集</button>
+  <button class="menu-button" onclick="uploadAvatar()">プロフィール画像変更</button>
+  <button class="menu-button" onclick="showFriendCode()">友だちコード・QR</button>
+  <button class="menu-button" onclick="createGroup()">グループ作成</button>
+  <button class="menu-button" onclick="showGroupMembers()">グループメンバー</button>
+  <button class="menu-button" onclick="leaveGroup()">グループ退出</button>
+  <button class="menu-button" onclick="hideConversation()">チャットを非表示</button>
+  <button class="menu-button" onclick="deleteConversation()">自分の一覧から削除</button>
+  <button class="menu-button" onclick="toggleBlock()">ブロック・解除</button>
+  <button class="menu-button" onclick="reportUser()">ユーザーを通報</button>
+  <button class="menu-button" onclick="toggleTheme()">白・黒テーマ切替</button>
+  <button class="menu-button" onclick="logout()">ログアウト</button>
+  <button class="menu-button" onclick="toggleMenu()">閉じる</button>
 </div>
-<div id="modal" class="modal hidden"><div class="modal-card"><h3 id="modalTitle">確認</h3><div id="modalBody"></div><div class="modal-actions"><button class="secondary" onclick="closeModal()">閉じる</button></div></div></div>
-<div id="notice"></div><div id="contextMenu" class="context-menu hidden"></div>
+
+<!-- モーダル -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <h3 id="modalTitle">確認</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="notice"></div>
+<div id="contextMenu" class="context-menu hidden"></div>
+
 <script>
-'use strict';
-const SUPABASE_URL='https://hxrtpftlklgwesvanlpk.supabase.co';
-const SUPABASE_KEY='sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=id=>document.getElementById(id);
-let me=null,current=null,peer=null,messagesChannel=null,listChannel=null;
-let conversations=[],friends=[],blockedUsers=new Set(),hiddenFriendIds=new Set(),presenceTimer=null,viewMode='chats';
-const stickers=['😀','😂','🥰','😍','😭','😎','👍','❤️','🎉','🙏','🐱','🐶','🌸','🔥','✨','💯'];
-function notice(t){$('notice').textContent=t;$('notice').style.display='block';clearTimeout(notice.timer);notice.timer=setTimeout(()=>$('notice').style.display='none',3500)}
-function callNotice(t){notice(t)}
-function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function avatar(name,url){return url?'<img src="'+safe(url)+'" alt="">':safe((name||'G').trim().charAt(0).toUpperCase())}
-function closeModal(){$('modal').classList.add('hidden')}
-function showModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').classList.remove('hidden')}
-function toggleMenu(){$('userPanel').classList.toggle('hidden')}
-function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('gm_theme',document.body.classList.contains('dark')?'dark':'light')}
-if(localStorage.getItem('gm_theme')==='dark')document.body.classList.add('dark');
-function showLogin(){$('loginForm').classList.remove('hidden');$('signupForm').classList.add('hidden');$('authMessage').textContent=''}
-function showSignup(){$('loginForm').classList.add('hidden');$('signupForm').classList.remove('hidden');$('authMessage').textContent=''}
-async function login(){
- const email=$('email').value.trim(),password=$('password').value;$('authMessage').textContent='';
- if(!email||!password){$('authMessage').textContent='メールアドレスとパスワードを入力してください';return}
- const {data,error}=await db.auth.signInWithPassword({email,password});
- if(error){$('authMessage').textContent='ログインエラー: '+error.message;return}
- await startApp(data.user);
+"use strict";
+
+/* =====================================================
+   Supabase接続設定
+===================================================== */
+
+const SUPABASE_URL =
+  "https://hxrtpftlklgwesvanlpk.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_b1tG9o1bXMzZBXGHBJZhZA_Ak-KYmnZ";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const $ = id => document.getElementById(id);
+
+let me = null;
+let current = null;
+let peer = null;
+
+let conversations = [];
+let friends = [];
+let blockedUsers = new Set();
+
+let messagesChannel = null;
+let listChannel = null;
+let presenceTimer = null;
+
+let viewMode = "chats";
+
+const stickers = [
+  "😀","😂","🥰","😍","😭","😎",
+  "👍","❤️","🎉","🙏","🐱","🐶",
+  "🌸","🔥","✨","💯","👏","🙌"
+];
+
+/* =====================================================
+   共通処理
+===================================================== */
+
+function notice(message) {
+  $("notice").textContent = message;
+  $("notice").style.display = "block";
+
+  clearTimeout(notice.timer);
+
+  notice.timer = setTimeout(() => {
+    $("notice").style.display = "none";
+  }, 3500);
 }
-async function signup(){
- const name=$('signupName').value.trim(),email=$('signupEmail').value.trim(),password=$('signupPassword').value,password2=$('signupPassword2').value;
- $('authMessage').textContent='';
- if(!name||!email||!password){$('authMessage').textContent='すべての項目を入力してください';return}
- if(password.length<6){$('authMessage').textContent='パスワードは6文字以上にしてください';return}
- if(password!==password2){$('authMessage').textContent='パスワードが一致しません';return}
- const {data,error}=await db.auth.signUp({email,password,options:{data:{display_name:name}}});
- if(error){$('authMessage').textContent='新規登録エラー: '+error.message;return}
- if(data.session&&data.user){
-  const {error:profileError}=await db.from('profiles').upsert({id:data.user.id,display_name:name},{onConflict:'id'});
-  if(profileError){$('authMessage').textContent='登録はできましたがプロフィール保存に失敗しました: '+profileError.message;return}
-  $('authMessage').style.color='#168a48';$('authMessage').textContent='登録しました。ログインします。';
+
+function callNotice(message) {
+  notice(message);
+}
+
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[c]);
+}
+
+function avatar(name, url) {
+  if (url) {
+    return '<img src="' + safe(url) + '" alt="">';
+  }
+
+  return safe(
+    (name || "G").trim().charAt(0).toUpperCase()
+  );
+}
+
+function closeModal() {
+  $("modal").classList.add("hidden");
+}
+
+function showModal(title, html) {
+  $("modalTitle").textContent = title;
+  $("modalBody").innerHTML = html;
+  $("modal").classList.remove("hidden");
+}
+
+function toggleMenu() {
+  $("userPanel").classList.toggle("hidden");
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+
+  localStorage.setItem(
+    "gm_theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
+}
+
+if (localStorage.getItem("gm_theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+/* =====================================================
+   ログイン・新規登録
+===================================================== */
+
+function showLogin() {
+  $("loginForm").classList.remove("hidden");
+  $("signupForm").classList.add("hidden");
+  $("authMessage").textContent = "";
+  $("authMessage").style.color = "#d33";
+}
+
+function showSignup() {
+  $("loginForm").classList.add("hidden");
+  $("signupForm").classList.remove("hidden");
+  $("authMessage").textContent = "";
+  $("authMessage").style.color = "#d33";
+}
+
+async function login() {
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
+
+  $("authMessage").textContent = "";
+
+  if (!email || !password) {
+    $("authMessage").textContent =
+      "メールアドレスとパスワードを入力してください";
+    return;
+  }
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    $("authMessage").textContent =
+      "ログインエラー: " + error.message;
+    return;
+  }
+
   await startApp(data.user);
- }else{
-  $('authMessage').style.color='#168a48';$('authMessage').textContent='確認メールを送信しました。メール内のリンクを開いてからログインしてください。';
+}
+
+async function signup() {
+  const name = $("signupName").value.trim();
+  const email = $("signupEmail").value.trim();
+  const password = $("signupPassword").value;
+  const passwordConfirm = $("signupPasswordConfirm").value;
+
+  $("authMessage").textContent = "";
+
+  if (!name || !email || !password) {
+    $("authMessage").textContent =
+      "すべての項目を入力してください";
+    return;
+  }
+
+  if (password.length < 6) {
+    $("authMessage").textContent =
+      "パスワードは6文字以上にしてください";
+    return;
+  }
+
+  if (password !== passwordConfirm) {
+    $("authMessage").textContent =
+      "パスワードが一致しません";
+    return;
+  }
+
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        display_name: name
+      }
+    }
+  });
+
+  if (error) {
+    $("authMessage").textContent =
+      "新規登録エラー: " + error.message;
+    return;
+  }
+
+  if (data.session && data.user) {
+    const { error: profileError } = await db
+      .from("profiles")
+      .upsert({
+        id: data.user.id,
+        display_name: name
+      }, {
+        onConflict: "id"
+      });
+
+    if (profileError) {
+      $("authMessage").textContent =
+        "登録後のプロフィール保存エラー: " +
+        profileError.message;
+      return;
+    }
+
+    await startApp(data.user);
+    return;
+  }
+
+  $("authMessage").style.color = "#168a48";
+  $("authMessage").textContent =
+    "確認メールを送信しました。メール内のリンクを開いてからログインしてください。";
+
   showLogin();
- }
 }
-async function startApp(user){
- me=user;
- const {data:p,error}=await db.from('profiles').select('id,display_name,avatar_url,bio,friend_code').eq('id',me.id).maybeSingle();
- if(error){notice('プロフィール取得エラー: '+error.message);return}
- if(!p){notice('プロフィールがありません。Supabaseのプロフィール自動作成設定を確認してください');return}
- me.name=p.display_name||user.user_metadata?.display_name||'ユーザー';me.avatar_url=p.avatar_url||'';me.bio=p.bio||'';me.friend_code=p.friend_code||'';
- $('myName').textContent=me.name;$('myAvatar').innerHTML=avatar(me.name,me.avatar_url);
- $('login').classList.add('hidden');$('app').classList.remove('hidden');
- await loadBlocks();await loadFriends();await loadConversations();await updatePresence();startPresence();subscribeList();
+
+/* =====================================================
+   アプリ起動
+===================================================== */
+
+async function startApp(user) {
+  me = user;
+
+  const { data: profile, error } = await db
+    .from("profiles")
+    .select("id,display_name,avatar_url,bio,friend_code")
+    .eq("id", me.id)
+    .maybeSingle();
+
+  if (error) {
+    notice("プロフィール取得エラー: " + error.message);
+    return;
+  }
+
+  if (!profile) {
+    notice(
+      "プロフィールが見つかりません。Supabaseのプロフィール自動作成設定を確認してください。"
+    );
+    return;
+  }
+
+  me.name =
+    profile.display_name ||
+    user.user_metadata?.display_name ||
+    "ユーザー";
+
+  me.avatar_url = profile.avatar_url || "";
+  me.bio = profile.bio || "";
+  me.friend_code = profile.friend_code || "";
+
+  $("myName").textContent = me.name;
+  $("myAvatar").innerHTML = avatar(me.name, me.avatar_url);
+
+  $("loginScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  await loadBlocks();
+  await loadFriends();
+  await loadConversations();
+  await updatePresence();
+
+  startPresence();
+  subscribeList();
 }
-async function loadBlocks(){const {data,error}=await db.from('gm_blocks').select('blocked_id').eq('blocker_id',me.id);if(error){notice('ブロック一覧エラー: '+error.message);return}blockedUsers=new Set((data||[]).map(x=>x.blocked_id))}
-async function loadFriends(){
- const {data,error}=await db.from('gm_friends').select('friend_id').eq('user_id',me.id);
- if(error){notice('友だち一覧エラー（gm_friends）: '+error.message);friends=[];return}
- const ids=(data||[]).map(x=>x.friend_id);
- if(!ids.length){friends=[];return}
- const {data:profiles,error:profileError}=await db.from('profiles').select('id,display_name,avatar_url').in('id',ids);
- if(profileError){notice('友だちプロフィール取得エラー: '+profileError.message);friends=[];return}
- const {data:hidden,error:hiddenError}=await db.from('gm_friend_hidden').select('friend_id').eq('user_id',me.id);
- if(hiddenError){notice('友だち非表示情報エラー: '+hiddenError.message);hiddenFriendIds=new Set()}else hiddenFriendIds=new Set((hidden||[]).map(x=>x.friend_id));
- friends=(profiles||[]).filter(p=>!hiddenFriendIds.has(p.id));
+
+/* =====================================================
+   ブロック一覧
+===================================================== */
+
+async function loadBlocks() {
+  const { data, error } = await db
+    .from("gm_blocks")
+    .select("blocked_id")
+    .eq("blocker_id", me.id);
+
+  if (error) {
+    notice("ブロック一覧エラー: " + error.message);
+    return;
+  }
+
+  blockedUsers = new Set(
+    (data || []).map(row => row.blocked_id)
+  );
 }
-async function loadConversations(){
- const {data,error}=await db.from('gm_conversation_members').select('conversation_id,gm_conversations(id,conversation_type,title,created_at)').eq('user_id',me.id);
- if(error){notice('チャット一覧エラー: '+error.message);return}
- const rows=(data||[]).map(x=>x.gm_conversations).filter(Boolean),ids=rows.map(x=>x.id);
- if(!ids.length){conversations=[];renderCurrentList();return}
- const {data:members}=await db.from('gm_conversation_members').select('conversation_id,user_id').in('conversation_id',ids);
- const otherIds=[...new Set((members||[]).filter(x=>x.user_id!==me.id).map(x=>x.user_id))];
- const {data:profiles}=otherIds.length?await db.from('profiles').select('id,display_name,avatar_url').in('id',otherIds):{data:[]};
- const pmap=new Map((profiles||[]).map(p=>[p.id,p]));
- const {data:msgs}=await db.from('gm_messages').select('id,conversation_id,content,message_type,created_at,sender_id,deleted_at').in('conversation_id',ids).order('created_at',{ascending:false});
- const {data:hidden}=await db.from('gm_conversation_hidden').select('conversation_id').eq('user_id',me.id);
- const hiddenIds=new Set((hidden||[]).map(x=>x.conversation_id));
- conversations=rows.filter(c=>!hiddenIds.has(c.id)).map(c=>{
-  const ms=(members||[]).filter(m=>m.conversation_id===c.id),other=ms.find(m=>m.user_id!==me.id),p=other?pmap.get(other.user_id):null,last=(msgs||[]).find(m=>m.conversation_id===c.id);
-  return {id:c.id,type:c.conversation_type,title:c.title,name:c.conversation_type==='group'?(c.title||'グループ'):(p?.display_name||'ユーザー'),peerId:other?.user_id,avatar_url:p?.avatar_url||'',memberCount:ms.length,last:last?.deleted_at?'メッセージを削除しました':last?.content||'',time:last?.created_at||c.created_at};
- });
- renderCurrentList();
+
+/* =====================================================
+   友だち一覧
+   profilesとの曖昧な外部キー結合を使わず、
+   友だちIDとプロフィールを別々に取得する
+===================================================== */
+
+async function loadFriends() {
+  const { data, error } = await db
+    .from("gm_friends")
+    .select("friend_id")
+    .eq("user_id", me.id);
+
+  if (error) {
+    notice("友だち一覧エラー: " + error.message);
+    friends = [];
+    return;
+  }
+
+  const ids = (data || []).map(row => row.friend_id);
+
+  if (!ids.length) {
+    friends = [];
+    return;
+  }
+
+  const { data: profiles, error: profileError } = await db
+    .from("profiles")
+    .select("id,display_name,avatar_url")
+    .in("id", ids);
+
+  if (profileError) {
+    notice("友だちプロフィール取得エラー: " + profileError.message);
+    friends = [];
+    return;
+  }
+
+  const { data: hidden, error: hiddenError } = await db
+    .from("gm_friend_hidden")
+    .select("friend_id")
+    .eq("user_id", me.id);
+
+  if (hiddenError) {
+    notice("友だち非表示情報エラー: " + hiddenError.message);
+    friends = profiles || [];
+    return;
+  }
+
+  const hiddenIds = new Set(
+    (hidden || []).map(row => row.friend_id)
+  );
+
+  friends = (profiles || []).filter(
+    profile => !hiddenIds.has(profile.id)
+  );
 }
-function renderCurrentList(){if(viewMode==='friends')renderFriends($('search').value);else if(viewMode==='chats')renderList($('search').value)}
-function showChats(){viewMode='chats';$('search').placeholder='チャットを検索';renderList('')}
-function showFriends(){viewMode='friends';$('search').placeholder='友だちを検索';renderFriends('')}
-function renderList(filter=''){
- const list=$('chatList');list.innerHTML='';const rows=conversations.filter(c=>c.name.toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>new Date(b.time)-new Date(a.time));
- if(!rows.length){list.innerHTML='<div class="empty">チャットがありません</div>';return}
- rows.forEach(c=>{const el=document.createElement('div');el.className='chat-item';el.innerHTML='<div class="avatar">'+avatar(c.name,c.avatar_url)+'</div><div class="chat-info"><div class="chat-name">'+safe(c.name)+'</div><div class="chat-preview">'+safe(c.last||'会話を始めましょう')+'</div></div><div class="time">'+new Date(c.time).toLocaleDateString('ja-JP')+'</div>';el.onclick=()=>openChat(c);addLongPress(el,()=>conversationMenu(c));list.appendChild(el)})
+
+/* =====================================================
+   チャット一覧
+===================================================== */
+
+async function loadConversations() {
+  const { data, error } = await db
+    .from("gm_conversation_members")
+    .select(
+      "conversation_id,gm_conversations(id,conversation_type,title,created_at)"
+    )
+    .eq("user_id", me.id);
+
+  if (error) {
+    notice("チャット一覧エラー: " + error.message);
+    return;
+  }
+
+  const rows = (data || [])
+    .map(row => row.gm_conversations)
+    .filter(Boolean);
+
+  const ids = rows.map(row => row.id);
+
+  if (!ids.length) {
+    conversations = [];
+    renderCurrentList();
+    return;
+  }
+
+  const { data: members } = await db
+    .from("gm_conversation_members")
+    .select("conversation_id,user_id")
+    .in("conversation_id", ids);
+
+  const otherIds = [
+    ...new Set(
+      (members || [])
+        .filter(row => row.user_id !== me.id)
+        .map(row => row.user_id)
+    )
+  ];
+
+  let profiles = [];
+
+  if (otherIds.length) {
+    const result = await db
+      .from("profiles")
+      .select("id,display_name,avatar_url")
+      .in("id", otherIds);
+
+    profiles = result.data || [];
+  }
+
+  const profileMap = new Map(
+    profiles.map(profile => [profile.id, profile])
+  );
+
+  const { data: messages } = await db
+    .from("gm_messages")
+    .select(
+      "id,conversation_id,content,message_type,created_at,sender_id,deleted_at"
+    )
+    .in("conversation_id", ids)
+    .order("created_at", { ascending: false });
+
+  const { data: hidden } = await db
+    .from("gm_conversation_hidden")
+    .select("conversation_id")
+    .eq("user_id", me.id);
+
+  const hiddenIds = new Set(
+    (hidden || []).map(row => row.conversation_id)
+  );
+
+  conversations = rows
+    .filter(row => !hiddenIds.has(row.id))
+    .map(conversation => {
+      const conversationMembers = (members || []).filter(
+        row => row.conversation_id === conversation.id
+      );
+
+      const other = conversationMembers.find(
+        row => row.user_id !== me.id
+      );
+
+      const otherProfile = other
+        ? profileMap.get(other.user_id)
+        : null;
+
+      const lastMessage = (messages || []).find(
+        row => row.conversation_id === conversation.id
+      );
+
+      const name =
+        conversation.conversation_type === "group"
+          ? conversation.title || "グループ"
+          : otherProfile?.display_name || "ユーザー";
+
+      return {
+        id: conversation.id,
+        type: conversation.conversation_type,
+        title: conversation.title,
+        name,
+        peerId: other?.user_id || null,
+        avatar_url: otherProfile?.avatar_url || "",
+        memberCount: conversationMembers.length,
+        last: lastMessage?.deleted_at
+          ? "メッセージを削除しました"
+          : lastMessage?.content || "",
+        time: lastMessage?.created_at || conversation.created_at
+      };
+    });
+
+  renderCurrentList();
 }
-function renderFriends(filter=''){
- const list=$('chatList');list.innerHTML='';const rows=friends.filter(p=>(p.display_name||'').toLowerCase().includes(filter.toLowerCase()));
- if(!rows.length){list.innerHTML='<div class="empty">友だちはまだいません<br>友だち追加から登録してください</div>';return}
- rows.forEach(p=>{const el=document.createElement('div');el.className='chat-item';el.innerHTML='<div class="avatar">'+avatar(p.display_name,p.avatar_url)+'</div><div class="chat-info"><div class="chat-name">'+safe(p.display_name)+'</div><div class="chat-preview">友だち</div></div>';el.onclick=()=>createChat(p);addLongPress(el,()=>friendMenu(p));list.appendChild(el)})
+
+function renderCurrentList() {
+  if (viewMode === "friends") {
+    renderFriends($("searchInput").value);
+  } else {
+    renderList($("searchInput").value);
+  }
 }
-function addLongPress(el,callback){let timer=null;el.addEventListener('touchstart',()=>{timer=setTimeout(callback,600)},{passive:true});['touchend','touchmove','touchcancel'].forEach(ev=>el.addEventListener(ev,()=>clearTimeout(timer),{passive:true}));el.addEventListener('contextmenu',e=>{e.preventDefault();callback()})}
-function showContext(items){const box=$('contextMenu');box.innerHTML='';items.forEach(item=>{const b=document.createElement('button');b.textContent=item.label;b.onclick=()=>{box.classList.add('hidden');item.action()};box.appendChild(b)});box.classList.remove('hidden');box.style.left='50%';box.style.top='50%';box.style.transform='translate(-50%,-50%)'}
-document.addEventListener('click',e=>{if(!e.target.closest('#contextMenu'))$('contextMenu').classList.add('hidden')});
-function conversationMenu(c){current=c;showContext([{label:'チャットを非表示',action:hideConversation},{label:'自分の一覧から削除',action:deleteConversation},{label:'キャンセル',action:()=>{}}])}
-function friendMenu(p){showContext([{label:'友だちを非表示',action:()=>hideFriend(p)},{label:'友だち登録を削除',action:()=>removeFriend(p)},{label:'ブロック',action:()=>blockFriend(p)},{label:'キャンセル',action:()=>{}}])}
-function subscribeList(){if(listChannel)db.removeChannel(listChannel);listChannel=db.channel('gm-list-'+me.id).on('postgres_changes',{event:'*',schema:'public',table:'gm_messages'},()=>loadConversations()).subscribe()}
-async function showFriendCode(){
- $('userPanel').classList.add('hidden');const {data:code,error}=await db.rpc('gm_get_my_friend_code');
- if(error){notice('友だちコード取得エラー: '+error.message);return}me.friend_code=code;
- showModal('友だちコード・QRコード','<p>あなたの友だちコード</p><div class="friend-code">'+safe(code)+'</div><button class="secondary" onclick="copyCode()">コードをコピー</button><div id="qrCode"></div><hr><p>友だちのコードを入力</p><input id="friendCodeInput" placeholder="友だちコード"><button class="primary" onclick="addFriend()">友だちを追加</button>');
- $('qrCode').innerHTML='';if(window.QRCode)new QRCode($('qrCode'),{text:code,width:170,height:170});
+
+function setActiveTab(tab) {
+  $("tabChats").classList.toggle("active", tab === "chats");
+  $("tabFriends").classList.toggle("active", tab === "friends");
 }
-function copyCode(){if(!me.friend_code)return notice('コードがありません');navigator.clipboard.writeText(me.friend_code).then(()=>notice('コピーしました')).catch(()=>notice('コピーできませんでした'))}
-async function addFriend(){const code=$('friendCodeInput').value.trim();if(!code)return notice('友だちコードを入力してください');const {error}=await db.rpc('gm_add_friend_by_code',{p_code:code});if(error)return notice('友だち追加エラー: '+error.message);closeModal();await loadFriends();showFriends();notice('友だちを追加しました')}
-async function hideFriend(p){if(!confirm(p.display_name+'を非表示にしますか？'))return;const {error}=await db.from('gm_friend_hidden').upsert({user_id:me.id,friend_id:p.id},{onConflict:'user_id,friend_id'});if(error)return notice(error.message);await loadFriends();renderFriends()}
-async function removeFriend(p){if(!confirm(p.display_name+'の友だち登録を削除しますか？'))return;const {error}=await db.rpc('gm_remove_friend',{p_friend_id:p.id});if(error)return notice(error.message);await loadFriends();renderFriends();notice('友だち登録を削除しました')}
-async function blockFriend(p){if(!confirm(p.display_name+'をブロックしますか？'))return;const {error}=await db.from('gm_blocks').upsert({blocker_id:me.id,blocked_id:p.id});if(error)return notice(error.message);blockedUsers.add(p.id);notice('ブロックしました')}
-async function createChat(p){
- if(blockedUsers.has(p.id))return notice('このユーザーはブロック中です');
- const {data:blocks}=await db.from('gm_blocks').select('blocker_id').eq('blocker_id',p.id).eq('blocked_id',me.id);if(blocks?.length)return notice('このユーザーとはチャットできません');
- const {data,error}=await db.rpc('gm_start_direct_chat',{p_other_user_id:p.id});if(error)return notice('チャット作成エラー: '+error.message);
- const id=typeof data==='string'?data:data?.id;await loadConversations();const c=conversations.find(x=>x.id===id)||{id,name:p.display_name,peerId:p.id,avatar_url:p.avatar_url,type:'direct'};await openChat(c)
+
+function showChats() {
+  viewMode = "chats";
+  setActiveTab("chats");
+  $("searchInput").placeholder = "チャットを検索";
+  renderList("");
 }
-async function openChat(c){
- current=c;peer={id:c.peerId,name:c.name};$('app').classList.add('in-chat');$('peerName').textContent=c.name;$('peerAvatar').innerHTML=avatar(c.name,c.avatar_url);$('peerStatus').textContent=c.type==='group'?'グループチャット':'GATE MESSAGE';$('messages').innerHTML='';await loadMessages();
- if(messagesChannel)await db.removeChannel(messagesChannel);
- messagesChannel=db.channel('gm-room-'+c.id).on('postgres_changes',{event:'*',schema:'public',table:'gm_messages',filter:'conversation_id=eq.'+c.id},()=>loadMessages()).subscribe();await updatePeerPresence()
+
+function showFriends() {
+  viewMode = "friends";
+  setActiveTab("friends");
+  $("searchInput").placeholder = "友だちを検索";
+  renderFriends("");
 }
-function backToList(){$('app').classList.remove('in-chat');if(messagesChannel){db.removeChannel(messagesChannel);messagesChannel=null}current=null;peer=null}
-async function loadMessages(){
- if(!current)return;const {data,error}=await db.from('gm_messages').select('*').eq('conversation_id',current.id).order('created_at',{ascending:true});if(error)return notice('メッセージ取得エラー: '+error.message);
- $('messages').innerHTML='';for(const m of data||[])await renderMessage(m);$('messages').scrollTop=$('messages').scrollHeight;
- for(const m of (data||[]).filter(m=>m.sender_id!==me.id&&!m.deleted_at))await markRead(m)
+
+/* =====================================================
+   チャット・友だちの表示
+===================================================== */
+
+function renderList(filter = "") {
+  const list = $("chatList");
+  list.innerHTML = "";
+
+  const rows = conversations
+    .filter(row =>
+      row.name.toLowerCase().includes(filter.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.time) - new Date(a.time));
+
+  if (!rows.length) {
+    list.innerHTML =
+      '<div class="empty">チャットがありません</div>';
+    return;
+  }
+
+  rows.forEach(conversation => {
+    const element = document.createElement("div");
+    element.className = "chat-item";
+
+    element.innerHTML = `
+      <div class="avatar">
+        ${avatar(conversation.name, conversation.avatar_url)}
+      </div>
+      <div class="chat-info">
+        <div class="chat-name">${safe(conversation.name)}</div>
+        <div class="chat-preview">
+          ${safe(conversation.last || "会話を始めましょう")}
+        </div>
+      </div>
+      <div class="chat-time">
+        ${new Date(conversation.time).toLocaleDateString("ja-JP")}
+      </div>
+    `;
+
+    element.onclick = () => openChat(conversation);
+
+    addLongPress(element, () => {
+      conversationMenu(conversation);
+    });
+
+    list.appendChild(element);
+  });
 }
-async function renderMessage(m){
- if(!m||!current||m.conversation_id!==current.id)return;const old=$('msg-'+m.id);if(old)old.remove();const mine=m.sender_id===me.id,row=document.createElement('div');row.id='msg-'+m.id;row.className='msg-row'+(mine?' mine':'');let body='';
- if(m.deleted_at)body='<i>このメッセージは削除されました</i>';else if(m.message_type==='image')body='<img src="'+safe(m.media_url)+'" alt="写真">';else if(m.message_type==='video')body='<video controls playsinline src="'+safe(m.media_url)+'"></video>';else if(m.message_type==='sticker')body='<div class="sticker">'+safe(m.content)+'</div>';else body=safe(m.content).replace(/\n/g,'<br>');
- let readText='';if(mine){const {data:reads}=await db.from('gm_message_reads').select('user_id').eq('message_id',m.id).neq('user_id',me.id);if(reads?.length)readText='既読'}
- const {data:reactions}=await db.from('gm_message_reactions').select('reaction,user_id').eq('message_id',m.id);const reactionText=(reactions||[]).map(r=>safe(r.reaction)).join(' ');
- row.innerHTML='<div class="bubble">'+body+'</div><div class="msg-meta">'+new Date(m.created_at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+(m.edited_at?' 編集':'')+' '+readText+'</div>'+(reactionText?'<div>'+reactionText+'</div>':'')+'<div class="msg-actions">'+(mine&&!m.deleted_at?'<button onclick="editMessage(\''+m.id+'\')">編集</button><button onclick="deleteMessage(\''+m.id+'\')">削除</button>':'')+(!m.deleted_at?'<button onclick="reactMessage(\''+m.id+'\')">❤️</button><button onclick="reportMessage(\''+m.id+'\')">通報</button>':'')+'</div>';
- $('messages').appendChild(row);$('messages').scrollTop=$('messages').scrollHeight
+
+function renderFriends(filter = "") {
+  const list = $("chatList");
+  list.innerHTML = "";
+
+  const rows = friends.filter(profile =>
+    (profile.display_name || "")
+      .toLowerCase()
+      .includes(filter.toLowerCase())
+  );
+
+  if (!rows.length) {
+    list.innerHTML = `
+      <div class="empty">
+        友だちはまだいません<br>
+        友だち追加から登録してください
+      </div>
+    `;
+    return;
+  }
+
+  rows.forEach(profile => {
+    const element = document.createElement("div");
+    element.className = "chat-item";
+
+    element.innerHTML = `
+      <div class="avatar">
+        ${avatar(profile.display_name, profile.avatar_url)}
+      </div>
+      <div class="chat-info">
+        <div class="chat-name">${safe(profile.display_name)}</div>
+        <div class="chat-preview">友だち</div>
+      </div>
+    `;
+
+    element.onclick = () => createChat(profile);
+
+    addLongPress(element, () => {
+      friendMenu(profile);
+    });
+
+    list.appendChild(element);
+  });
 }
-async function markRead(m){if(!m||m.sender_id===me.id)return;await db.from('gm_message_reads').upsert({message_id:m.id,user_id:me.id},{onConflict:'message_id,user_id',ignoreDuplicates:true})}
-async function sendMessage(){
- if(!current)return;const text=$('messageInput').value.trim();if(!text)return;if(peer?.id&&blockedUsers.has(peer.id))return notice('ブロック中です');
- if(peer?.id){const {data:blocks}=await db.from('gm_blocks').select('blocker_id').eq('blocker_id',peer.id).eq('blocked_id',me.id);if(blocks?.length)return notice('相手からブロックされています')}
- const {error}=await db.from('gm_messages').insert({conversation_id:current.id,sender_id:me.id,content:text,message_type:'text'});if(error)return notice('送信できません: '+error.message);$('messageInput').value=''
+
+/* =====================================================
+   長押しメニュー
+===================================================== */
+
+function addLongPress(element, callback) {
+  let timer = null;
+
+  element.addEventListener("touchstart", () => {
+    timer = setTimeout(callback, 600);
+  }, { passive:true });
+
+  ["touchend", "touchmove", "touchcancel"].forEach(eventName => {
+    element.addEventListener(eventName, () => {
+      clearTimeout(timer);
+    }, { passive:true });
+  });
+
+  element.addEventListener("contextmenu", event => {
+    event.preventDefault();
+    callback();
+  });
 }
-async function uploadMedia(input,type){const files=Array.from(input.files||[]);if(!files.length||!current)return;for(const file of files){if(file.size>50*1024*1024){notice('50MBを超えています');continue}const ext=(file.name.split('.').pop()||'bin').toLowerCase(),path=me.id+'/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;const {error:up}=await db.storage.from('gm-media').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(up){notice(up.message);continue}const {data}=db.storage.from('gm-media').getPublicUrl(path);const {error}=await db.from('gm_messages').insert({conversation_id:current.id,sender_id:me.id,content:type==='image'?'写真を送信しました':'動画を送信しました',message_type:type,media_url:data.publicUrl,media_name:file.name});if(error)notice(error.message)}input.value=''}
-function buildStickers(){$('stickerGrid').innerHTML='';stickers.forEach(s=>{const b=document.createElement('button');b.textContent=s;b.style.cssText='font-size:27px;border:0;padding:8px;background:var(--bg);border-radius:8px';b.onclick=()=>sendSticker(s);$('stickerGrid').appendChild(b)})}
-function toggleStickers(){$('stickerPanel').classList.toggle('hidden')}
-async function sendSticker(s){if(!current)return;const {error}=await db.from('gm_messages').insert({conversation_id:current.id,sender_id:me.id,content:s,message_type:'sticker'});if(error)notice(error.message);$('stickerPanel').classList.add('hidden')}
-async function editMessage(id){const {data:m}=await db.from('gm_messages').select('content').eq('id',id).eq('sender_id',me.id).maybeSingle();if(!m)return;const value=prompt('メッセージを編集',m.content);if(value===null||!value.trim())return;const {error}=await db.from('gm_messages').update({content:value.trim(),edited_at:new Date().toISOString()}).eq('id',id).eq('sender_id',me.id);if(error)return notice(error.message);await loadMessages()}
-async function deleteMessage(id){if(!confirm('このメッセージを削除しますか？'))return;const {error}=await db.from('gm_messages').update({deleted_at:new Date().toISOString()}).eq('id',id).eq('sender_id',me.id);if(error)return notice(error.message);await loadMessages()}
-async function reactMessage(id){const reaction=prompt('リアクションを入力','❤️');if(!reaction)return;const {error}=await db.from('gm_message_reactions').insert({message_id:id,user_id:me.id,reaction});if(error)notice(error.message);else await loadMessages()}
-async function hideConversation(){if(!current||!confirm('自分の一覧から非表示にしますか？'))return;const {error}=await db.from('gm_conversation_hidden').upsert({conversation_id:current.id,user_id:me.id},{onConflict:'conversation_id,user_id'});if(error)return notice(error.message);$('userPanel').classList.add('hidden');backToList();await loadConversations()}
-async function deleteConversation(){if(!current||!confirm('自分の一覧から削除しますか？相手側の会話は削除されません。'))return;await hideConversation()}
-async function showHiddenChats(){const {data,error}=await db.from('gm_conversation_hidden').select('conversation_id,gm_conversations(title,conversation_type)').eq('user_id',me.id);if(error)return notice(error.message);if(!data?.length)return notice('非表示のチャットはありません');showModal('非表示チャット',(data||[]).map(x=>'<div style="padding:10px;border-bottom:1px solid var(--line)">'+safe(x.gm_conversations?.title||'個別チャット')+' <button class="secondary" onclick="unhideConversation(\''+x.conversation_id+'\')">復元</button></div>').join(''))}
-async function unhideConversation(id){const {error}=await db.from('gm_conversation_hidden').delete().eq('conversation_id',id).eq('user_id',me.id);if(error)return notice(error.message);closeModal();await loadConversations();notice('復元しました')}
-async function toggleBlock(){if(!peer?.id)return notice('個別チャットで使用してください');const isBlocked=blockedUsers.has(peer.id);if(!confirm(isBlocked?'ブロックを解除しますか？':'ブロックしますか？'))return;let result;if(isBlocked){result=await db.from('gm_blocks').delete().eq('blocker_id',me.id).eq('blocked_id',peer.id);if(!result.error)blockedUsers.delete(peer.id)}else{result=await db.from('gm_blocks').insert({blocker_id:me.id,blocked_id:peer.id});if(!result.error)blockedUsers.add(peer.id)}if(result.error)return notice(result.error.message);notice(isBlocked?'ブロックを解除しました':'ブロックしました')}
-async function editProfile(){const name=prompt('表示名',me.name);if(name===null||!name.trim())return;const bio=prompt('自己紹介',me.bio||'');if(bio===null)return;const {error}=await db.from('profiles').update({display_name:name.trim(),bio:bio.trim()}).eq('id',me.id);if(error)return notice(error.message);me.name=name.trim();me.bio=bio.trim();$('myName').textContent=me.name;notice('プロフィールを更新しました')}
-function uploadAvatar(){const input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=async()=>{const file=input.files?.[0];if(!file)return;if(file.size>5*1024*1024)return notice('画像は5MB以下にしてください');const ext=(file.name.split('.').pop()||'jpg').toLowerCase(),path=me.id+'/avatars/'+Date.now()+'.'+ext;const {error:up}=await db.storage.from('gm-media').upload(path,file,{upsert:true,contentType:file.type});if(up)return notice(up.message);const {data}=db.storage.from('gm-media').getPublicUrl(path);const {error}=await db.from('profiles').update({avatar_url:data.publicUrl}).eq('id',me.id);if(error)return notice(error.message);me.avatar_url=data.publicUrl;$('myAvatar').innerHTML=avatar(me.name,me.avatar_url);notice('画像を更新しました')};input.click()}
-async function createGroup(){await loadFriends();if(!friends.length)return notice('先に友だちを追加してください');let html='<input id="groupTitle" placeholder="グループ名">';friends.forEach(p=>{html+='<label style="display:block;padding:8px"><input type="checkbox" class="groupFriend" value="'+p.id+'" style="width:auto">'+safe(p.display_name)+'</label>'});html+='<button class="primary" onclick="submitGroup()">グループを作成</button>';showModal('グループチャット作成',html)}
-async function submitGroup(){const title=$('groupTitle').value.trim(),ids=Array.from(document.querySelectorAll('.groupFriend:checked')).map(x=>x.value);if(!title||!ids.length)return notice('グループ名と友だちを選択してください');const {data,error}=await db.rpc('gm_create_group_chat',{p_title:title,p_member_ids:ids});if(error)return notice('グループ作成エラー: '+error.message);closeModal();await loadConversations();const c=conversations.find(x=>x.id===data);if(c)await openChat(c);notice('グループを作成しました')}
-async function showGroupMembers(){if(!current||current.type!=='group')return notice('グループで使用してください');const {data,error}=await db.from('gm_conversation_members').select('user_id').eq('conversation_id',current.id);if(error)return notice(error.message);const ids=(data||[]).map(x=>x.user_id),{data:ps}=await db.from('profiles').select('id,display_name').in('id',ids);const names=new Map((ps||[]).map(p=>[p.id,p.display_name]));showModal('グループメンバー',(data||[]).map(x=>'<p>'+safe(names.get(x.user_id)||'ユーザー')+(x.user_id===me.id?'（自分）':'')+'</p>').join(''))}
-async function leaveGroup(){if(!current||current.type!=='group')return notice('グループで使用してください');if(!confirm('グループから退出しますか？'))return;const {error}=await db.rpc('gm_leave_group_chat',{p_conversation_id:current.id});if(error)return notice(error.message);backToList();await loadConversations();notice('退出しました')}
-async function reportUser(){if(!peer?.id)return notice('相手を選択してください');const reason=prompt('通報理由');if(!reason?.trim())return;const {error}=await db.from('gm_reports').insert({reporter_id:me.id,reported_user_id:peer.id,reason:reason.trim()});if(error)return notice(error.message);notice('通報を受け付けました')}
-async function reportMessage(id){const reason=prompt('通報理由');if(!reason?.trim())return;const {data:m}=await db.from('gm_messages').select('sender_id').eq('id',id).maybeSingle();const {error}=await db.from('gm_reports').insert({reporter_id:me.id,reported_user_id:m?.sender_id||null,message_id:id,reason:reason.trim()});if(error)return notice(error.message);notice('通報を受け付けました')}
-async function updatePresence(){if(!me)return;const now=new Date().toISOString();const {error}=await db.from('gm_user_presence').upsert({user_id:me.id,is_online:true,last_seen_at:now},{onConflict:'user_id'});if(error)console.warn('presence:',error.message)}
-function startPresence(){if(presenceTimer)clearInterval(presenceTimer);presenceTimer=setInterval(updatePresence,30000)}
-async function updatePeerPresence(){if(!peer?.id)return;const {data}=await db.from('gm_user_presence').select('is_online,last_seen_at').eq('user_id',peer.id).maybeSingle();$('peerStatus').innerHTML=data?.is_online?'<span class="online-dot"></span>オンライン':'GATE MESSAGE'}
-async function logout(){if(presenceTimer)clearInterval(presenceTimer);if(messagesChannel)await db.removeChannel(messagesChannel);if(listChannel)await db.removeChannel(listChannel);await db.auth.signOut();me=null;location.reload()}
-$('search').addEventListener('input',e=>{if(viewMode==='friends')renderFriends(e.target.value);else renderList(e.target.value)});
-$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
-$('photoFile').addEventListener('change',e=>uploadMedia(e.target,'image'));$('videoFile').addEventListener('change',e=>uploadMedia(e.target,'video'));
+
+function showContext(items) {
+  const box = $("contextMenu");
+  box.innerHTML = "";
+
+  items.forEach(item => {
+    const button = document.createElement("button");
+    button.textContent = item.label;
+
+    button.onclick = () => {
+      box.classList.add("hidden");
+      item.action();
+    };
+
+    box.appendChild(button);
+  });
+
+  box.classList.remove("hidden");
+  box.style.left = "50%";
+  box.style.top = "50%";
+  box.style.transform = "translate(-50%,-50%)";
+}
+
+document.addEventListener("click", event => {
+  if (!event.target.closest("#contextMenu")) {
+    $("contextMenu").classList.add("hidden");
+  }
+});
+
+function conversationMenu(conversation) {
+  current = conversation;
+
+  showContext([
+    {
+      label:"チャットを非表示",
+      action:hideConversation
+    },
+    {
+      label:"自分の一覧から削除",
+      action:deleteConversation
+    },
+    {
+      label:"キャンセル",
+      action:() => {}
+    }
+  ]);
+}
+
+function friendMenu(profile) {
+  showContext([
+    {
+      label:"友だちを非表示",
+      action:() => hideFriend(profile)
+    },
+    {
+      label:"友だち登録を削除",
+      action:() => removeFriend(profile)
+    },
+    {
+      label:"ブロック",
+      action:() => blockFriend(profile)
+    },
+    {
+      label:"キャンセル",
+      action:() => {}
+    }
+  ]);
+}
+
+/* =====================================================
+   リアルタイム更新
+===================================================== */
+
+function subscribeList() {
+  if (listChannel) {
+    db.removeChannel(listChannel);
+  }
+
+  listChannel = db
+    .channel("gm-list-" + me.id)
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"gm_messages"
+      },
+      () => loadConversations()
+    )
+    .subscribe();
+}
+
+/* =====================================================
+   友だちコード・QR
+===================================================== */
+
+async function showFriendCode() {
+  $("userPanel").classList.add("hidden");
+
+  const { data: code, error } = await db.rpc(
+    "gm_get_my_friend_code"
+  );
+
+  if (error) {
+    notice("友だちコード取得エラー: " + error.message);
+    return;
+  }
+
+  me.friend_code = code;
+
+  showModal(
+    "友だちコード・QRコード",
+    `
+      <p>あなたの友だちコード</p>
+      <div class="friend-code">${safe(code)}</div>
+      <button class="secondary" onclick="copyCode()">
+        コードをコピー
+      </button>
+      <div id="qrCode"></div>
+      <hr>
+      <p>友だちのコードを入力</p>
+      <input id="friendCodeInput" placeholder="友だちコード">
+      <button class="primary" onclick="addFriend()">
+        友だちを追加
+      </button>
+    `
+  );
+
+  $("qrCode").innerHTML = "";
+
+  if (window.QRCode) {
+    new QRCode($("qrCode"), {
+      text:code,
+      width:170,
+      height:170
+    });
+  }
+}
+
+function copyCode() {
+  if (!me.friend_code) {
+    notice("コードがありません");
+    return;
+  }
+
+  navigator.clipboard.writeText(me.friend_code)
+    .then(() => notice("コピーしました"))
+    .catch(() => notice("コピーできませんでした"));
+}
+
+async function addFriend() {
+  const code = $("friendCodeInput").value.trim();
+
+  if (!code) {
+    notice("友だちコードを入力してください");
+    return;
+  }
+
+  const { error } = await db.rpc(
+    "gm_add_friend_by_code",
+    { p_code:code }
+  );
+
+  if (error) {
+    notice("友だち追加エラー: " + error.message);
+    return;
+  }
+
+  closeModal();
+  await loadFriends();
+  showFriends();
+
+  notice("友だちを追加しました");
+}
+
+/* =====================================================
+   友だち管理
+===================================================== */
+
+async function hideFriend(profile) {
+  if (!confirm(profile.display_name + "を非表示にしますか？")) {
+    return;
+  }
+
+  const { error } = await db
+    .from("gm_friend_hidden")
+    .upsert({
+      user_id:me.id,
+      friend_id:profile.id
+    }, {
+      onConflict:"user_id,friend_id"
+    });
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  await loadFriends();
+  renderFriends();
+}
+
+async function removeFriend(profile) {
+  if (!confirm(
+    profile.display_name + "の友だち登録を削除しますか？"
+  )) {
+    return;
+  }
+
+  const { error } = await db.rpc(
+    "gm_remove_friend",
+    { p_friend_id:profile.id }
+  );
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  await loadFriends();
+  renderFriends();
+
+  notice("友だち登録を削除しました");
+}
+
+async function blockFriend(profile) {
+  if (!confirm(profile.display_name + "をブロックしますか？")) {
+    return;
+  }
+
+  const { error } = await db
+    .from("gm_blocks")
+    .upsert({
+      blocker_id:me.id,
+      blocked_id:profile.id
+    });
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  blockedUsers.add(profile.id);
+  notice("ブロックしました");
+}
+
+/* =====================================================
+   個別チャット
+===================================================== */
+
+async function createChat(profile) {
+  if (blockedUsers.has(profile.id)) {
+    notice("このユーザーはブロック中です");
+    return;
+  }
+
+  const { data: blocks } = await db
+    .from("gm_blocks")
+    .select("blocker_id")
+    .eq("blocker_id", profile.id)
+    .eq("blocked_id", me.id);
+
+  if (blocks && blocks.length) {
+    notice("このユーザーとはチャットできません");
+    return;
+  }
+
+  const { data, error } = await db.rpc(
+    "gm_start_direct_chat",
+    { p_other_user_id:profile.id }
+  );
+
+  if (error) {
+    notice("チャット作成エラー: " + error.message);
+    return;
+  }
+
+  const conversationId =
+    typeof data === "string" ? data : data?.id;
+
+  await loadConversations();
+
+  const conversation =
+    conversations.find(row => row.id === conversationId) || {
+      id:conversationId,
+      name:profile.display_name,
+      peerId:profile.id,
+      avatar_url:profile.avatar_url,
+      type:"direct"
+    };
+
+  await openChat(conversation);
+}
+
+/* =====================================================
+   チャットを開く
+===================================================== */
+
+async function openChat(conversation) {
+  current = conversation;
+
+  peer = {
+    id:conversation.peerId,
+    name:conversation.name
+  };
+
+  $("app").classList.add("in-chat");
+
+  $("peerName").textContent = conversation.name;
+  $("peerAvatar").innerHTML =
+    avatar(conversation.name, conversation.avatar_url);
+
+  $("peerStatus").textContent =
+    conversation.type === "group"
+      ? "グループチャット"
+      : "GATE MESSAGE";
+
+  $("messages").innerHTML = "";
+
+  await loadMessages();
+
+  if (messagesChannel) {
+    await db.removeChannel(messagesChannel);
+  }
+
+  messagesChannel = db
+    .channel("gm-room-" + conversation.id)
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"gm_messages",
+        filter:"conversation_id=eq." + conversation.id
+      },
+      () => loadMessages()
+    )
+    .subscribe();
+
+  await updatePeerPresence();
+}
+
+function backToList() {
+  $("app").classList.remove("in-chat");
+
+  if (messagesChannel) {
+    db.removeChannel(messagesChannel);
+    messagesChannel = null;
+  }
+
+  current = null;
+  peer = null;
+}
+
+/* =====================================================
+   メッセージ読み込み
+===================================================== */
+
+async function loadMessages() {
+  if (!current) return;
+
+  const conversationId = current.id;
+
+  const { data, error } = await db
+    .from("gm_messages")
+    .select("*")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending:true });
+
+  if (error) {
+    notice("メッセージ取得エラー: " + error.message);
+    return;
+  }
+
+  if (!current || current.id !== conversationId) return;
+
+  $("messages").innerHTML = "";
+
+  for (const message of data || []) {
+    await renderMessage(message);
+  }
+
+  $("messages").scrollTop = $("messages").scrollHeight;
+
+  for (const message of (data || []).filter(
+    row => row.sender_id !== me.id && !row.deleted_at
+  )) {
+    await markRead(message);
+  }
+}
+
+/* =====================================================
+   メッセージ表示
+===================================================== */
+
+async function renderMessage(message) {
+  if (!message || !current) return;
+
+  const mine = message.sender_id === me.id;
+
+  const row = document.createElement("div");
+  row.id = "msg-" + message.id;
+  row.className = "message-row" + (mine ? " mine" : "");
+
+  let body = "";
+
+  if (message.deleted_at) {
+    body = "<i>このメッセージは削除されました</i>";
+  } else if (message.message_type === "image") {
+    body =
+      '<img src="' + safe(message.media_url) +
+      '" alt="写真">';
+  } else if (message.message_type === "video") {
+    body =
+      '<video controls playsinline src="' +
+      safe(message.media_url) + '"></video>';
+  } else if (message.message_type === "sticker") {
+    body =
+      '<div class="sticker-message">' +
+      safe(message.content) +
+      '</div>';
+  } else {
+    body = safe(message.content).replace(/\n/g, "<br>");
+  }
+
+  let readText = "";
+
+  if (mine) {
+    const { data: reads } = await db
+      .from("gm_message_reads")
+      .select("user_id")
+      .eq("message_id", message.id)
+      .neq("user_id", me.id);
+
+    if (reads && reads.length) {
+      readText = "既読";
+    }
+  }
+
+  const { data: reactions } = await db
+    .from("gm_message_reactions")
+    .select("reaction,user_id")
+    .eq("message_id", message.id);
+
+  const reactionText = (reactions || [])
+    .map(row => safe(row.reaction))
+    .join(" ");
+
+  row.innerHTML = `
+    <div class="bubble">${body}</div>
+    <div class="message-meta">
+      ${new Date(message.created_at).toLocaleTimeString("ja-JP", {
+        hour:"2-digit",
+        minute:"2-digit"
+      })}
+      ${message.edited_at ? " 編集" : ""}
+      ${readText}
+    </div>
+    ${reactionText ? "<div>" + reactionText + "</div>" : ""}
+    <div class="message-actions">
+      ${
+        mine && !message.deleted_at
+          ? `
+            <button onclick="editMessage('${message.id}')">編集</button>
+            <button onclick="deleteMessage('${message.id}')">削除</button>
+          `
+          : ""
+      }
+      ${
+        !message.deleted_at
+          ? `
+            <button onclick="reactMessage('${message.id}')">❤️</button>
+            <button onclick="reportMessage('${message.id}')">通報</button>
+          `
+          : ""
+      }
+    </div>
+  `;
+
+  $("messages").appendChild(row);
+}
+
+/* =====================================================
+   既読
+===================================================== */
+
+async function markRead(message) {
+  if (!message || message.sender_id === me.id) return;
+
+  await db
+    .from("gm_message_reads")
+    .upsert({
+      message_id:message.id,
+      user_id:me.id
+    }, {
+      onConflict:"message_id,user_id",
+      ignoreDuplicates:true
+    });
+}
+
+/* =====================================================
+   テキスト送信
+===================================================== */
+
+async function sendMessage() {
+  if (!current) {
+    notice("チャットを選択してください");
+    return;
+  }
+
+  const text = $("messageInput").value.trim();
+
+  if (!text) return;
+
+  if (peer?.id && blockedUsers.has(peer.id)) {
+    notice("ブロック中です");
+    return;
+  }
+
+  if (peer?.id) {
+    const { data: blocks } = await db
+      .from("gm_blocks")
+      .select("blocker_id")
+      .eq("blocker_id", peer.id)
+      .eq("blocked_id", me.id);
+
+    if (blocks && blocks.length) {
+      notice("相手からブロックされています");
+      return;
+    }
+  }
+
+  const { error } = await db
+    .from("gm_messages")
+    .insert({
+      conversation_id:current.id,
+      sender_id:me.id,
+      content:text,
+      message_type:"text"
+    });
+
+  if (error) {
+    notice("送信できません: " + error.message);
+    return;
+  }
+
+  $("messageInput").value = "";
+}
+
+/* =====================================================
+   写真・動画送信
+===================================================== */
+
+async function uploadMedia(input, type) {
+  const files = Array.from(input.files || []);
+
+  if (!files.length || !current) return;
+
+  for (const file of files) {
+    if (file.size > 50 * 1024 * 1024) {
+      notice("50MBを超えています");
+      continue;
+    }
+
+    const extension =
+      (file.name.split(".").pop() || "bin").toLowerCase();
+
+    const path =
+      me.id + "/" + Date.now() + "-" +
+      crypto.randomUUID() + "." + extension;
+
+    const { error: uploadError } = await db
+      .storage
+      .from("gm-media")
+      .upload(path, file, {
+        cacheControl:"3600",
+        upsert:false,
+        contentType:file.type
+      });
+
+    if (uploadError) {
+      notice("ファイルアップロードエラー: " + uploadError.message);
+      continue;
+    }
+
+    const { data } = db
+      .storage
+      .from("gm-media")
+      .getPublicUrl(path);
+
+    const { error } = await db
+      .from("gm_messages")
+      .insert({
+        conversation_id:current.id,
+        sender_id:me.id,
+        content:type === "image"
+          ? "写真を送信しました"
+          : "動画を送信しました",
+        message_type:type,
+        media_url:data.publicUrl,
+        media_name:file.name
+      });
+
+    if (error) {
+      notice("メディア送信エラー: " + error.message);
+    }
+  }
+
+  input.value = "";
+}
+
+/* =====================================================
+   スタンプ
+===================================================== */
+
+function buildStickers() {
+  $("stickerGrid").innerHTML = "";
+
+  stickers.forEach(sticker => {
+    const button = document.createElement("button");
+
+    button.textContent = sticker;
+    button.onclick = () => sendSticker(sticker);
+
+    $("stickerGrid").appendChild(button);
+  });
+}
+
+function toggleStickers() {
+  $("stickerPanel").classList.toggle("hidden");
+}
+
+async function sendSticker(sticker) {
+  if (!current) return;
+
+  const { error } = await db
+    .from("gm_messages")
+    .insert({
+      conversation_id:current.id,
+      sender_id:me.id,
+      content:sticker,
+      message_type:"sticker"
+    });
+
+  if (error) {
+    notice(error.message);
+  }
+
+  $("stickerPanel").classList.add("hidden");
+}
+
+/* =====================================================
+   メッセージ編集・削除
+===================================================== */
+
+async function editMessage(id) {
+  const { data } = await db
+    .from("gm_messages")
+    .select("content")
+    .eq("id", id)
+    .eq("sender_id", me.id)
+    .maybeSingle();
+
+  if (!data) return;
+
+  const value = prompt("メッセージを編集", data.content);
+
+  if (value === null || !value.trim()) return;
+
+  const { error } = await db
+    .from("gm_messages")
+    .update({
+      content:value.trim(),
+      edited_at:new Date().toISOString()
+    })
+    .eq("id", id)
+    .eq("sender_id", me.id);
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  await loadMessages();
+}
+
+async function deleteMessage(id) {
+  if (!confirm("このメッセージを削除しますか？")) {
+    return;
+  }
+
+  const { error } = await db
+    .from("gm_messages")
+    .update({
+      deleted_at:new Date().toISOString()
+    })
+    .eq("id", id)
+    .eq("sender_id", me.id);
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  await loadMessages();
+}
+
+/* =====================================================
+   リアクション
+===================================================== */
+
+async function reactMessage(id) {
+  const reaction = prompt("リアクションを入力", "❤️");
+
+  if (!reaction) return;
+
+  const { error } = await db
+    .from("gm_message_reactions")
+    .insert({
+      message_id:id,
+      user_id:me.id,
+      reaction
+    });
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  await loadMessages();
+}
+
+/* =====================================================
+   チャット非表示・復元
+===================================================== */
+
+async function hideConversation() {
+  if (!current) {
+    notice("チャットを選択してください");
+    return;
+  }
+
+  if (!confirm("自分の一覧から非表示にしますか？")) {
+    return;
+  }
+
+  const { error } = await db
+    .from("gm_conversation_hidden")
+    .upsert({
+      conversation_id:current.id,
+      user_id:me.id
+    }, {
+      onConflict:"conversation_id,user_id"
+    });
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  $("userPanel").classList.add("hidden");
+
+  backToList();
+  await loadConversations();
+}
+
+async function deleteConversation() {
+  if (!current) return;
+
+  if (!confirm(
+    "自分の一覧から削除しますか？相手側の会話は削除されません。"
+  )) {
+    return;
+  }
+
+  await hideConversation();
+}
+
+async function showHiddenChats() {
+  const { data, error } = await db
+    .from("gm_conversation_hidden")
+    .select("conversation_id,gm_conversations(title,conversation_type)")
+    .eq("user_id", me.id);
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  if (!data || !data.length) {
+    notice("非表示のチャットはありません");
+    return;
+  }
+
+  const html = data.map(row => `
+    <div style="padding:10px;border-bottom:1px solid var(--line)">
+      ${safe(row.gm_conversations?.title || "個別チャット")}
+      <button class="secondary"
+        onclick="unhideConversation('${row.conversation_id}')">
+        復元
+      </button>
+    </div>
+  `).join("");
+
+  showModal("非表示チャット", html);
+}
+
+async function unhideConversation(id) {
+  const { error } = await db
+    .from("gm_conversation_hidden")
+    .delete()
+    .eq("conversation_id", id)
+    .eq("user_id", me.id);
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  closeModal();
+  await loadConversations();
+
+  notice("復元しました");
+}
+
+/* =====================================================
+   ブロック・解除
+===================================================== */
+
+async function toggleBlock() {
+  if (!peer?.id) {
+    notice("個別チャットで使用してください");
+    return;
+  }
+
+  const isBlocked = blockedUsers.has(peer.id);
+
+  if (!confirm(
+    isBlocked ? "ブロックを解除しますか？" : "ブロックしますか？"
+  )) {
+    return;
+  }
+
+  let result;
+
+  if (isBlocked) {
+    result = await db
+      .from("gm_blocks")
+      .delete()
+      .eq("blocker_id", me.id)
+      .eq("blocked_id", peer.id);
+
+    if (!result.error) {
+      blockedUsers.delete(peer.id);
+    }
+  } else {
+    result = await db
+      .from("gm_blocks")
+      .insert({
+        blocker_id:me.id,
+        blocked_id:peer.id
+      });
+
+    if (!result.error) {
+      blockedUsers.add(peer.id);
+    }
+  }
+
+  if (result.error) {
+    notice(result.error.message);
+    return;
+  }
+
+  notice(
+    isBlocked
+      ? "ブロックを解除しました"
+      : "ブロックしました"
+  );
+}
+
+/* =====================================================
+   プロフィール編集
+===================================================== */
+
+async function editProfile() {
+  const name = prompt("表示名", me.name);
+
+  if (name === null || !name.trim()) return;
+
+  const bio = prompt("自己紹介", me.bio || "");
+
+  if (bio === null) return;
+
+  const { error } = await db
+    .from("profiles")
+    .update({
+      display_name:name.trim(),
+      bio:bio.trim()
+    })
+    .eq("id", me.id);
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  me.name = name.trim();
+  me.bio = bio.trim();
+
+  $("myName").textContent = me.name;
+
+  notice("プロフィールを更新しました");
+}
+
+function uploadAvatar() {
+  const input = document.createElement("input");
+
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.onchange = async () => {
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      notice("画像は5MB以下にしてください");
+      return;
+    }
+
+    const extension =
+      (file.name.split(".").pop() || "jpg").toLowerCase();
+
+    const path =
+      me.id + "/avatars/" + Date.now() + "." + extension;
+
+    const { error: uploadError } = await db
+      .storage
+      .from("gm-media")
+      .upload(path, file, {
+        upsert:true,
+        contentType:file.type
+      });
+
+    if (uploadError) {
+      notice(uploadError.message);
+      return;
+    }
+
+    const { data } = db
+      .storage
+      .from("gm-media")
+      .getPublicUrl(path);
+
+    const { error } = await db
+      .from("profiles")
+      .update({
+        avatar_url:data.publicUrl
+      })
+      .eq("id", me.id);
+
+    if (error) {
+      notice(error.message);
+      return;
+    }
+
+    me.avatar_url = data.publicUrl;
+
+    $("myAvatar").innerHTML =
+      avatar(me.name, me.avatar_url);
+
+    notice("画像を更新しました");
+  };
+
+  input.click();
+}
+
+/* =====================================================
+   グループ作成
+===================================================== */
+
+async function createGroup() {
+  $("userPanel").classList.add("hidden");
+
+  await loadFriends();
+
+  if (!friends.length) {
+    notice("先に友だちを追加してください");
+    return;
+  }
+
+  let html = `
+    <input id="groupTitle" placeholder="グループ名">
+  `;
+
+  friends.forEach(profile => {
+    html += `
+      <label style="display:block;padding:8px">
+        <input
+          type="checkbox"
+          class="groupFriend"
+          value="${profile.id}"
+          style="width:auto"
+        >
+        ${safe(profile.display_name)}
+      </label>
+    `;
+  });
+
+  html += `
+    <button class="primary" onclick="submitGroup()">
+      グループを作成
+    </button>
+  `;
+
+  showModal("グループチャット作成", html);
+}
+
+async function submitGroup() {
+  const title = $("groupTitle").value.trim();
+
+  const ids = Array.from(
+    document.querySelectorAll(".groupFriend:checked")
+  ).map(element => element.value);
+
+  if (!title || !ids.length) {
+    notice("グループ名と友だちを選択してください");
+    return;
+  }
+
+  const { data, error } = await db.rpc(
+    "gm_create_group_chat",
+    {
+      p_title:title,
+      p_member_ids:ids
+    }
+  );
+
+  if (error) {
+    notice("グループ作成エラー: " + error.message);
+    return;
+  }
+
+  closeModal();
+
+  await loadConversations();
+
+  const conversation = conversations.find(
+    row => row.id === data
+  );
+
+  if (conversation) {
+    await openChat(conversation);
+  }
+
+  notice("グループを作成しました");
+}
+
+/* =====================================================
+   グループメンバー
+===================================================== */
+
+async function showGroupMembers() {
+  if (!current || current.type !== "group") {
+    notice("グループで使用してください");
+    return;
+  }
+
+  const { data, error } = await db
+    .from("gm_conversation_members")
+    .select("user_id")
+    .eq("conversation_id", current.id);
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  const ids = (data || []).map(row => row.user_id);
+
+  const { data: profiles } = await db
+    .from("profiles")
+    .select("id,display_name")
+    .in("id", ids);
+
+  const names = new Map(
+    (profiles || []).map(profile => [
+      profile.id,
+      profile.display_name
+    ])
+  );
+
+  const html = (data || []).map(row => `
+    <p>
+      ${safe(names.get(row.user_id) || "ユーザー")}
+      ${row.user_id === me.id ? "（自分）" : ""}
+    </p>
+  `).join("");
+
+  showModal("グループメンバー", html);
+}
+
+/* =====================================================
+   グループ退出
+===================================================== */
+
+async function leaveGroup() {
+  if (!current || current.type !== "group") {
+    notice("グループで使用してください");
+    return;
+  }
+
+  if (!confirm("グループから退出しますか？")) {
+    return;
+  }
+
+  const { error } = await db.rpc(
+    "gm_leave_group_chat",
+    {
+      p_conversation_id:current.id
+    }
+  );
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  backToList();
+  await loadConversations();
+
+  notice("退出しました");
+}
+
+/* =====================================================
+   通報
+===================================================== */
+
+async function reportUser() {
+  if (!peer?.id) {
+    notice("相手を選択してください");
+    return;
+  }
+
+  const reason = prompt("通報理由");
+
+  if (!reason?.trim()) return;
+
+  const { error } = await db
+    .from("gm_reports")
+    .insert({
+      reporter_id:me.id,
+      reported_user_id:peer.id,
+      reason:reason.trim()
+    });
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  notice("通報を受け付けました");
+}
+
+async function reportMessage(id) {
+  const reason = prompt("通報理由");
+
+  if (!reason?.trim()) return;
+
+  const { data: message } = await db
+    .from("gm_messages")
+    .select("sender_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  const { error } = await db
+    .from("gm_reports")
+    .insert({
+      reporter_id:me.id,
+      reported_user_id:message?.sender_id || null,
+      message_id:id,
+      reason:reason.trim()
+    });
+
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  notice("通報を受け付けました");
+}
+
+/* =====================================================
+   オンライン状態
+===================================================== */
+
+async function updatePresence() {
+  if (!me) return;
+
+  const now = new Date().toISOString();
+
+  const { error } = await db
+    .from("gm_user_presence")
+    .upsert({
+      user_id:me.id,
+      is_online:true,
+      last_seen_at:now
+    }, {
+      onConflict:"user_id"
+    });
+
+  if (error) {
+    console.warn("presence:", error.message);
+  }
+}
+
+function startPresence() {
+  if (presenceTimer) {
+    clearInterval(presenceTimer);
+  }
+
+  presenceTimer = setInterval(updatePresence, 30000);
+}
+
+async function updatePeerPresence() {
+  if (!peer?.id) return;
+
+  const { data } = await db
+    .from("gm_user_presence")
+    .select("is_online,last_seen_at")
+    .eq("user_id", peer.id)
+    .maybeSingle();
+
+  $("peerStatus").innerHTML =
+    data?.is_online
+      ? '<span class="online-dot"></span>オンライン'
+      : "GATE MESSAGE";
+}
+
+/* =====================================================
+   ログアウト
+===================================================== */
+
+async function logout() {
+  if (presenceTimer) {
+    clearInterval(presenceTimer);
+  }
+
+  if (messagesChannel) {
+    await db.removeChannel(messagesChannel);
+  }
+
+  if (listChannel) {
+    await db.removeChannel(listChannel);
+  }
+
+  if (me) {
+    await db
+      .from("gm_user_presence")
+      .upsert({
+        user_id:me.id,
+        is_online:false,
+        last_seen_at:new Date().toISOString()
+      }, {
+        onConflict:"user_id"
+      });
+  }
+
+  await db.auth.signOut();
+
+  me = null;
+  location.reload();
+}
+
+/* =====================================================
+   イベント設定
+===================================================== */
+
+$("searchInput").addEventListener("input", event => {
+  if (viewMode === "friends") {
+    renderFriends(event.target.value);
+  } else {
+    renderList(event.target.value);
+  }
+});
+
+$("messageInput").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
+$("photoFile").addEventListener("change", event => {
+  uploadMedia(event.target, "image");
+});
+
+$("videoFile").addEventListener("change", event => {
+  uploadMedia(event.target, "video");
+});
+
+/* =====================================================
+   初期化
+===================================================== */
+
 buildStickers();
-db.auth.getSession().then(({data,error})=>{if(error)notice(error.message);if(data.session)startApp(data.session.user)});
-db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){me=null;$('app').classList.add('hidden');$('login').classList.remove('hidden')}});
+
+db.auth.getSession().then(({ data, error }) => {
+  if (error) {
+    notice(error.message);
+    return;
+  }
+
+  if (data.session) {
+    startApp(data.session.user);
+  }
+});
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT") {
+    me = null;
+
+    $("app").classList.add("hidden");
+    $("loginScreen").classList.remove("hidden");
+  }
+});
+
 </script>
 </body>
 </html>
