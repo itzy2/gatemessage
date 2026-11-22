@@ -13,6 +13,7 @@
 <meta name="application-name" content="GATE MESSAGE">
 <meta name="apple-mobile-web-app-title" content="GATE MESSAGE">
 <meta name="msapplication-TileColor" content="#16005c">
+<link rel="manifest" href="./manifest.webmanifest">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -625,6 +626,16 @@ button:disabled {
     padding:13px;
   }
 }
+
+
+/* 1対1 通話画面 */
+.call-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(4,10,28,.9);color:#fff}
+.call-card{width:100%;max-width:620px;border:1px solid #ffffff30;border-radius:22px;padding:22px;background:linear-gradient(145deg,#17264a,#07152f);box-shadow:0 20px 70px #0008;text-align:center}
+.call-title{font-size:20px;font-weight:800;margin-bottom:7px}.call-subtitle{color:#c3d3f2;font-size:13px;margin-bottom:18px}
+.call-video-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.call-video-grid video{width:100%;min-height:150px;max-height:340px;object-fit:cover;background:#020817;border-radius:14px}
+.call-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.call-actions button{border:0;border-radius:12px;padding:12px 16px;color:#fff;background:#247fe8;font-weight:700;min-width:92px}.call-actions .call-danger{background:#df4054}.call-actions .call-muted{background:#52627c}.call-avatar{font-size:52px;margin:16px 0}
+@media(max-width:520px){.call-card{padding:16px}.call-video-grid{grid-template-columns:1fr}.call-video-grid video{min-height:120px;max-height:230px}}
+
 </style>
 </head>
 
@@ -730,10 +741,8 @@ button:disabled {
         <div class="chat-status" id="peerStatus">GATE MESSAGE</div>
       </div>
 
-      <button class="icon-button"
-              onclick="callNotice('音声通話機能は準備中です')">☎</button>
-      <button class="icon-button"
-              onclick="callNotice('ビデオ通話機能は準備中です')">▣</button>
+      <button class="icon-button" onclick="startCall('audio')" title="音声通話">☎</button>
+      <button class="icon-button" onclick="startCall('video')" title="ビデオ通話">▣</button>
       <button class="icon-button" onclick="toggleMenu()">⋯</button>
     </header>
 
@@ -786,6 +795,7 @@ button:disabled {
   <button class="menu-button" onclick="deleteConversation()">自分の一覧から削除</button>
   <button class="menu-button" onclick="toggleBlock()">ブロック・解除</button>
   <button class="menu-button" onclick="reportUser()">ユーザーを通報</button>
+  <button class="menu-button" id="installAppButton" onclick="installApp()">アプリとしてインストール</button>
   <button class="menu-button" onclick="toggleTheme()">白・黒テーマ切替</button>
   <button class="menu-button" onclick="logout()">ログアウト</button>
   <button class="menu-button" onclick="toggleMenu()">閉じる</button>
@@ -798,6 +808,29 @@ button:disabled {
     <div id="modalBody"></div>
     <div class="modal-actions">
       <button class="secondary" onclick="closeModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- 1対1 音声・ビデオ通話画面 -->
+<div id="callOverlay" class="call-overlay hidden" aria-live="polite">
+  <div class="call-card">
+    <div class="call-title" id="callTitle">GATE MESSAGE 通話</div>
+    <div class="call-subtitle" id="callSubtitle">接続しています...</div>
+    <div id="callAvatar" class="call-avatar">☎</div>
+    <div id="callVideoGrid" class="call-video-grid hidden">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <video id="localVideo" autoplay playsinline muted></video>
+    </div>
+    <div class="call-actions" id="incomingCallActions">
+      <button onclick="acceptCall()">応答</button>
+      <button class="call-danger" onclick="rejectCall()">拒否</button>
+    </div>
+    <div class="call-actions hidden" id="activeCallActions">
+      <button id="muteButton" class="call-muted" onclick="toggleCallMute()">マイクOFF</button>
+      <button id="cameraButton" class="call-muted" onclick="toggleCallCamera()">カメラOFF</button>
+      <button class="call-danger" onclick="endCall()">通話終了</button>
     </div>
   </div>
 </div>
@@ -836,6 +869,17 @@ let blockedUsers = new Set();
 let messagesChannel = null;
 let listChannel = null;
 let presenceTimer = null;
+
+// WebRTC 1対1通話の状態
+let activeCall = null;
+let incomingCall = null;
+let incomingCallChannel = null;
+let activeCallChannel = null;
+let callRemoteDescriptionSet = false;
+let callPendingCandidates = [];
+let callMicEnabled = true;
+let callCameraEnabled = true;
+let deferredInstallPrompt = null;
 
 let viewMode = "chats";
 
@@ -1072,6 +1116,7 @@ async function startApp(user) {
 
   startPresence();
   subscribeList();
+  await subscribeIncomingCalls();
 }
 
 /* =====================================================
@@ -2648,10 +2693,419 @@ async function updatePeerPresence() {
 }
 
 /* =====================================================
+   1対1 音声・ビデオ通話（WebRTC + Supabase Realtime）
+   着信通知はログイン中でブラウザ/PWAが起動・接続中の場合に受信します。
+===================================================== */
+
+const CALL_ICE_SERVERS = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" }
+];
+
+function callOverlayShow() {
+  $("callOverlay").classList.remove("hidden");
+}
+
+function callOverlayHide() {
+  $("callOverlay").classList.add("hidden");
+  $("callVideoGrid").classList.add("hidden");
+  $("callAvatar").classList.remove("hidden");
+  $("incomingCallActions").classList.add("hidden");
+  $("activeCallActions").classList.add("hidden");
+  $("remoteVideo").srcObject = null;
+  $("localVideo").srcObject = null;
+}
+
+function callSetStatus(title, subtitle) {
+  $("callTitle").textContent = title;
+  $("callSubtitle").textContent = subtitle;
+}
+
+function callSetVideoMode(enabled) {
+  $("callVideoGrid").classList.toggle("hidden", !enabled);
+  $("callAvatar").classList.toggle("hidden", enabled);
+}
+
+function waitForCallChannel(channel) {
+  return new Promise((resolve, reject) => {
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        reject(new Error("通話リアルタイム接続がタイムアウトしました"));
+      }
+    }, 12000);
+    channel.subscribe(status => {
+      if (status === "SUBSCRIBED" && !done) {
+        done = true;
+        clearTimeout(timer);
+        resolve();
+      } else if (["CHANNEL_ERROR", "TIMED_OUT"].includes(status) && !done) {
+        done = true;
+        clearTimeout(timer);
+        reject(new Error("通話リアルタイム接続に失敗しました: " + status));
+      }
+    });
+  });
+}
+
+async function subscribeCallChannel(callId) {
+  if (activeCallChannel) {
+    await db.removeChannel(activeCallChannel);
+    activeCallChannel = null;
+  }
+  const channel = db.channel("gm-call-" + callId).on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: "gm_call_signals", filter: "call_id=eq." + callId },
+    payload => { handleCallSignal(payload.new); }
+  );
+  activeCallChannel = channel;
+  await waitForCallChannel(channel);
+}
+
+async function sendCallSignal(kind, payload = {}) {
+  if (!activeCall || !me) throw new Error("通話情報がありません");
+  const { error } = await db.from("gm_call_signals").insert({
+    call_id: activeCall.id,
+    conversation_id: activeCall.conversationId,
+    from_user: me.id,
+    to_user: activeCall.peerId,
+    kind,
+    payload
+  });
+  if (error) throw error;
+}
+
+async function createCallPeerConnection() {
+  const pc = new RTCPeerConnection({ iceServers: CALL_ICE_SERVERS });
+  activeCall.pc = pc;
+  pc.onicecandidate = event => {
+    if (event.candidate && activeCall && activeCall.pc === pc) {
+      sendCallSignal("ice", event.candidate.toJSON()).catch(error => {
+        console.error("ICE送信エラー", error);
+      });
+    }
+  };
+  pc.ontrack = event => {
+    const stream = event.streams && event.streams[0];
+    if (stream) {
+      $("remoteVideo").srcObject = stream;
+      $("remoteVideo").play().catch(() => {});
+    }
+  };
+  pc.onconnectionstatechange = () => {
+    if (!activeCall || activeCall.pc !== pc) return;
+    if (pc.connectionState === "connected") {
+      callSetStatus(activeCall.peerName, "通話中");
+    } else if (pc.connectionState === "failed") {
+      notice("通話接続に失敗しました。ネットワーク環境を確認してください。");
+      endCall(false);
+    } else if (pc.connectionState === "disconnected") {
+      callSetStatus(activeCall.peerName, "接続が不安定です...");
+    }
+  };
+  return pc;
+}
+
+async function getCallMedia(type) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    throw new Error("通話にはHTTPS接続とマイク/カメラ対応ブラウザが必要です");
+  }
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: true, noiseSuppression: true },
+    video: type === "video" ? { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } : false
+  });
+  activeCall.localStream = stream;
+  callMicEnabled = true;
+  callCameraEnabled = type === "video";
+  if (type === "video") {
+    $("localVideo").srcObject = stream;
+    $("localVideo").play().catch(() => {});
+  }
+  return stream;
+}
+
+async function startCall(type) {
+  if (!me || !current || !peer || !peer.id) {
+    notice("個別チャットを開いてから通話してください");
+    return;
+  }
+  if (current.type !== "direct") {
+    notice("通話は1対1の個別チャットで利用できます");
+    return;
+  }
+  if (activeCall || incomingCall) {
+    notice("すでに通話中、または着信があります");
+    return;
+  }
+  if (!window.isSecureContext) {
+    notice("通話にはHTTPS接続が必要です。GitHub Pagesのhttps://で開いてください。");
+    return;
+  }
+
+  activeCall = {
+    id: crypto.randomUUID(), conversationId: current.id,
+    peerId: peer.id, peerName: peer.name || current.name || "相手",
+    type, role: "caller", pc: null, localStream: null
+  };
+  callRemoteDescriptionSet = false;
+  callPendingCandidates = [];
+  callOverlayShow();
+  $("incomingCallActions").classList.add("hidden");
+  $("activeCallActions").classList.remove("hidden");
+  $("callAvatar").textContent = type === "video" ? "▣" : "☎";
+  callSetVideoMode(type === "video");
+  callSetStatus(activeCall.peerName, "発信しています...");
+
+  try {
+    const stream = await getCallMedia(type);
+    const pc = await createCallPeerConnection();
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    // 相手の応答を取りこぼさないよう、offer送信前に購読する
+    await subscribeCallChannel(activeCall.id);
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await sendCallSignal("offer", {
+      type: pc.localDescription.type,
+      sdp: pc.localDescription.sdp,
+      media_type: type
+    });
+    callSetStatus(activeCall.peerName, "呼び出し中...");
+    $("muteButton").textContent = "マイクOFF";
+    $("cameraButton").classList.toggle("hidden", type !== "video");
+  } catch (error) {
+    console.error(error);
+    notice("通話を開始できません: " + error.message);
+    await endCall(false);
+  }
+}
+
+async function subscribeIncomingCalls() {
+  if (!me) return;
+  if (incomingCallChannel) await db.removeChannel(incomingCallChannel);
+  incomingCallChannel = db.channel("gm-incoming-calls-" + me.id).on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: "gm_call_signals", filter: "to_user=eq." + me.id },
+    async payload => {
+      const signal = payload.new;
+      if (!signal || signal.kind !== "offer") return;
+      if (activeCall || incomingCall) {
+        try {
+          await db.from("gm_call_signals").insert({
+            call_id: signal.call_id, conversation_id: signal.conversation_id,
+            from_user: me.id, to_user: signal.from_user, kind: "busy", payload: {}
+          });
+        } catch (error) { console.warn(error); }
+        return;
+      }
+      const { data: profile } = await db.from("profiles")
+        .select("display_name").eq("id", signal.from_user).maybeSingle();
+      incomingCall = {
+        id: signal.call_id, conversationId: signal.conversation_id,
+        peerId: signal.from_user, peerName: profile?.display_name || "相手",
+        type: signal.payload?.media_type === "video" ? "video" : "audio",
+        offer: signal.payload
+      };
+      callOverlayShow();
+      callSetVideoMode(false);
+      $("callAvatar").textContent = incomingCall.type === "video" ? "▣" : "☎";
+      callSetStatus(incomingCall.peerName,
+        incomingCall.type === "video" ? "ビデオ通話の着信" : "音声通話の着信");
+      $("incomingCallActions").classList.remove("hidden");
+      $("activeCallActions").classList.add("hidden");
+    }
+  ).subscribe(status => {
+    if (status === "CHANNEL_ERROR") console.warn("着信チャンネル接続エラー");
+  });
+}
+
+async function acceptCall() {
+  if (!incomingCall || activeCall) return;
+  const offered = incomingCall;
+  incomingCall = null;
+  activeCall = {
+    id: offered.id, conversationId: offered.conversationId,
+    peerId: offered.peerId, peerName: offered.peerName,
+    type: offered.type, role: "callee", pc: null, localStream: null
+  };
+  callRemoteDescriptionSet = false;
+  callPendingCandidates = [];
+  try {
+    $("incomingCallActions").classList.add("hidden");
+    $("activeCallActions").classList.remove("hidden");
+    callSetStatus(activeCall.peerName, "接続しています...");
+    callSetVideoMode(activeCall.type === "video");
+    const stream = await getCallMedia(activeCall.type);
+    const pc = await createCallPeerConnection();
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    await subscribeCallChannel(activeCall.id);
+    await pc.setRemoteDescription(new RTCSessionDescription({
+      type: offered.offer.type, sdp: offered.offer.sdp
+    }));
+    callRemoteDescriptionSet = true;
+    await flushCallCandidates();
+    // 購読開始前に届いたICE候補もDBから回収
+    const { data: oldSignals, error: oldError } = await db.from("gm_call_signals")
+      .select("payload,from_user").eq("call_id", activeCall.id)
+      .eq("kind", "ice").neq("from_user", me.id);
+    if (oldError) throw oldError;
+    for (const row of oldSignals || []) {
+      try { await pc.addIceCandidate(new RTCIceCandidate(row.payload)); }
+      catch (error) { console.warn("既存ICE候補", error); }
+    }
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await sendCallSignal("answer", {
+      type: pc.localDescription.type, sdp: pc.localDescription.sdp
+    });
+    callSetStatus(activeCall.peerName, "応答しました。接続中...");
+    $("muteButton").textContent = "マイクOFF";
+    $("cameraButton").classList.toggle("hidden", activeCall.type !== "video");
+  } catch (error) {
+    console.error(error);
+    notice("通話に応答できません: " + error.message);
+    await endCall(true);
+  }
+}
+
+async function rejectCall() {
+  if (!incomingCall || !me) return;
+  const call = incomingCall;
+  incomingCall = null;
+  try {
+    await db.from("gm_call_signals").insert({
+      call_id: call.id, conversation_id: call.conversationId,
+      from_user: me.id, to_user: call.peerId, kind: "reject", payload: {}
+    });
+  } catch (error) { console.warn("拒否通知エラー", error); }
+  callOverlayHide();
+}
+
+async function flushCallCandidates() {
+  if (!activeCall?.pc || !callRemoteDescriptionSet) return;
+  const queued = callPendingCandidates.splice(0);
+  for (const candidate of queued) {
+    try { await activeCall.pc.addIceCandidate(new RTCIceCandidate(candidate)); }
+    catch (error) { console.warn("ICE候補エラー", error); }
+  }
+}
+
+async function handleCallSignal(signal) {
+  if (!activeCall || !signal || signal.call_id !== activeCall.id || signal.from_user === me.id) return;
+  try {
+    if (signal.kind === "answer" && activeCall.role === "caller") {
+      await activeCall.pc.setRemoteDescription(new RTCSessionDescription({
+        type: signal.payload.type, sdp: signal.payload.sdp
+      }));
+      callRemoteDescriptionSet = true;
+      await flushCallCandidates();
+      callSetStatus(activeCall.peerName, "接続しています...");
+    } else if (signal.kind === "ice") {
+      if (!callRemoteDescriptionSet) callPendingCandidates.push(signal.payload);
+      else await activeCall.pc.addIceCandidate(new RTCIceCandidate(signal.payload));
+    } else if (signal.kind === "reject") {
+      notice("相手が通話を拒否しました");
+      await endCall(false);
+    } else if (signal.kind === "busy") {
+      notice("相手は別の通話中です");
+      await endCall(false);
+    } else if (signal.kind === "hangup") {
+      notice("通話が終了しました");
+      await endCall(false);
+    }
+  } catch (error) {
+    console.error("通話信号処理エラー", error);
+    notice("通話処理に失敗しました: " + error.message);
+    await endCall(false);
+  }
+}
+
+function toggleCallMute() {
+  if (!activeCall?.localStream) return;
+  callMicEnabled = !callMicEnabled;
+  activeCall.localStream.getAudioTracks().forEach(track => { track.enabled = callMicEnabled; });
+  $("muteButton").textContent = callMicEnabled ? "マイクOFF" : "マイクON";
+}
+
+function toggleCallCamera() {
+  if (!activeCall?.localStream || activeCall.type !== "video") return;
+  callCameraEnabled = !callCameraEnabled;
+  activeCall.localStream.getVideoTracks().forEach(track => { track.enabled = callCameraEnabled; });
+  $("cameraButton").textContent = callCameraEnabled ? "カメラOFF" : "カメラON";
+}
+
+async function endCall(sendSignal = true) {
+  const call = activeCall;
+  activeCall = null;
+  incomingCall = null;
+  callRemoteDescriptionSet = false;
+  callPendingCandidates = [];
+  if (call && sendSignal && me) {
+    try {
+      await db.from("gm_call_signals").insert({
+        call_id: call.id, conversation_id: call.conversationId,
+        from_user: me.id, to_user: call.peerId, kind: "hangup", payload: {}
+      });
+    } catch (error) { console.warn("通話終了通知エラー", error); }
+  }
+  if (call?.pc) {
+    call.pc.ontrack = null;
+    call.pc.onicecandidate = null;
+    call.pc.close();
+  }
+  if (call?.localStream) call.localStream.getTracks().forEach(track => track.stop());
+  if (activeCallChannel) {
+    await db.removeChannel(activeCallChannel);
+    activeCallChannel = null;
+  }
+  callOverlayHide();
+}
+
+/* =====================================================
+   PWA インストール
+===================================================== */
+
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  const button = $("installAppButton");
+  if (button) button.classList.remove("hidden");
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  notice("GATE MESSAGEをアプリとしてインストールしました");
+});
+
+async function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    return;
+  }
+  notice("インストールできない場合は、ブラウザのメニューから「アプリをインストール」または「ホーム画面に追加」を選んでください");
+}
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(error => {
+      console.warn("Service Worker登録エラー", error);
+    });
+  });
+}
+
+/* =====================================================
    ログアウト
 ===================================================== */
 
 async function logout() {
+  if (activeCall) await endCall(false);
+  incomingCall = null;
+  if (incomingCallChannel) {
+    await db.removeChannel(incomingCallChannel);
+    incomingCallChannel = null;
+  }
   if (presenceTimer) {
     clearInterval(presenceTimer);
   }
