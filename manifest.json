@@ -1,0 +1,32 @@
+{
+  "id": "/gatemessage/",
+  "name": "GATE MESSAGE",
+  "short_name": "GATE MESSAGE",
+  "description": "GATE SQUARE公式メッセージアプリ",
+  "start_url": "/gatemessage/",
+  "scope": "/gatemessage/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#16005c",
+  "theme_color": "#16005c",
+  "icons": [
+    {
+      "src": "/gatemessage/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/gatemessage/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/gatemessage/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
